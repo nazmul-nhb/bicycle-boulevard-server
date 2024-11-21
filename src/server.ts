@@ -21,4 +21,4 @@ const bootStrap = async () => {
 
 bootStrap().catch(console.dir);
 
-export default app;
+// export default app;
