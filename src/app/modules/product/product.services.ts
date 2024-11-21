@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import type { TProduct, TProductDocument } from './product.interfaces';
 import { Product } from './product.model';
 
@@ -25,7 +26,20 @@ const getAllProductsFromDB = async (): Promise<TProductDocument[]> => {
 	return result;
 };
 
+/**
+ *
+ * @param id Accepts MongoDB ObjectId for a product (bicycle)
+ * @returns Returns matched student data from MongoDB or nothing
+ */
+const getSingleProductFromDB = async (
+	id: ObjectId,
+): Promise<TProductDocument | null> => {
+	const result = await Product.findById(id);
+	return result;
+};
+
 export default {
 	saveProductToDB,
 	getAllProductsFromDB,
+	getSingleProductFromDB,
 };

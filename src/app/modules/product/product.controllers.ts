@@ -3,9 +3,11 @@ import type {
 	TAllProducts,
 	TCreateProduct,
 	TProduct,
+	TSingleProduct,
 } from './product.interfaces';
 import { zodProductSchema } from './product.validation';
 import productServices from './product.services';
+import { ObjectId } from 'mongoose';
 
 /**
  *
@@ -55,7 +57,36 @@ const getAllProducts = async (
 	}
 };
 
+/**
+ *
+ * Get a single product (bicycle) data for a given mongodb objectId
+ */
+const getSingleProduct = async (
+	req: Request<{ id: ObjectId }>,
+	res: Response<TSingleProduct>,
+	next: NextFunction,
+): Promise<Response<TSingleProduct> | void> => {
+	try {
+		const { id } = req.params;
+
+		const product = await productServices.getSingleProductFromDB(id);
+
+		if (product) {
+			return res.status(200).json({
+				status: true,
+				message: `Bicycle retrieved successfully!`,
+				data: product,
+			});
+		} else {
+			throw new Error('No bicycle matched with the given ID!');
+		}
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const productControllers = {
 	createProduct,
 	getAllProducts,
+	getSingleProduct,
 };

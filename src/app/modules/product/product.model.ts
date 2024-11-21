@@ -43,7 +43,10 @@ const productSchema = new Schema<TProductDocument>(
 			default: true,
 		},
 	},
-	{ timestamps: true },
+	{
+		timestamps: true,
+		versionKey: false,
+	},
 );
 
 export const Product = model<TProductDocument>('Product', productSchema);
