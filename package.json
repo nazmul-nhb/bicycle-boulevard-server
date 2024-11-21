@@ -10,7 +10,6 @@
 	"scripts": {
 		"build": "rimraf dist && tsc",
 		"dev": "nodemon",
-		"deploy": "rimraf dist && tsc && vercel --prod",
 		"start": "node dist/server.js",
 		"format": "prettier --write src/",
 		"lint": "eslint src",
