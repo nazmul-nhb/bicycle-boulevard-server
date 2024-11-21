@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import type { TProduct } from './product.interfaces';
+import type { TProductDocument } from './product.interfaces';
 
-const productSchema = new Schema<TProduct>(
+const productSchema = new Schema<TProductDocument>(
 	{
 		name: {
 			type: String,
@@ -46,4 +46,4 @@ const productSchema = new Schema<TProduct>(
 	{ timestamps: true },
 );
 
-export const Product = model<TProduct>('Product', productSchema);
+export const Product = model<TProductDocument>('Product', productSchema);
