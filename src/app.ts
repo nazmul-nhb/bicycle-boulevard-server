@@ -24,7 +24,7 @@ app.use('/api/products', productRoutes);
 // Error handler for 404
 app.use((req: Request, _res: Response, next: NextFunction) => {
 	const error: ErrorWithStatus = new Error(
-		`Requested End-Point “${req.method} ${req.url}” Not Found!`,
+		`Requested End-Point “${req.method}: ${req.url}” Not Found!`,
 	);
 
 	error.status = 404;

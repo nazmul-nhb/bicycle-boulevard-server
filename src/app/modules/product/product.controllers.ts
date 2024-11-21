@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { TCreateProduct, TProduct } from './product.interfaces';
+import type {
+	TAllProducts,
+	TCreateProduct,
+	TProduct,
+} from './product.interfaces';
 import { zodProductSchema } from './product.validation';
 import productServices from './product.services';
 
@@ -29,6 +33,29 @@ const createProduct = async (
 	}
 };
 
+/**
+ *
+ * @returns Returns all student data from the DB
+ */
+const getAllProducts = async (
+	_req: Request,
+	res: Response<TAllProducts>,
+	next: NextFunction,
+): Promise<Response<TAllProducts> | void> => {
+	try {
+		const products = await productServices.getAllProductsFromDB();
+
+		return res.status(200).json({
+			status: true,
+			message: `Bicycles retrieved successfully!`,
+			data: products,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const productControllers = {
 	createProduct,
+	getAllProducts,
 };

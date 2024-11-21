@@ -11,3 +11,10 @@ export type TCreateProduct = {
 	message: string;
 	data: TProductDocument;
 };
+
+export type TAllProducts = {
+	// TODO: After getting assignment result, rename this status to success to maintain the coherency
+	status: boolean;
+	message: string;
+	data: TProductDocument[];
+};

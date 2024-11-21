@@ -16,6 +16,16 @@ const saveProductToDB = async (
     return result;
 };
 
+/**
+ *
+ * @returns Returns all product data from the DB
+ */
+const getAllProductsFromDB = async (): Promise<TProductDocument[]> => {
+	const result = await Product.find({});
+	return result;
+};
+
 export default {
 	saveProductToDB,
+	getAllProductsFromDB,
 };
