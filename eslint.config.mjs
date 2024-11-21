@@ -10,7 +10,7 @@ import prettierConfig from 'eslint-config-prettier';
 export default [
   {
     files: ['**/*.{js,mjs,cjs,ts}'],
-    ignores: ['node_modules', 'dist'],
+    ignorePatterns: ['node_modules', 'dist'],
   },
   {
     languageOptions: {

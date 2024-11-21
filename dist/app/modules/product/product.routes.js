@@ -5,37 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRoutes = void 0;
 const express_1 = __importDefault(require("express"));
+const product_controllers_1 = require("./product.controllers");
 const router = express_1.default.Router();
-router.get('/', (_req, res) => {
-    res.status(200).json({
-        message: 'Bicycles retrieved successfully',
-        status: true,
-        data: [
-            {
-                _id: '648a45e5f0123c45678d9012',
-                name: 'Roadster 5000',
-                brand: 'SpeedX',
-                price: 300,
-                type: 'Road',
-                description: 'A premium road bike designed for speed and performance.',
-                quantity: 20,
-                inStock: true,
-                createdAt: '2024-11-19T10:23:45.123Z',
-                updatedAt: '2024-11-19T10:23:45.123Z',
-            },
-            {
-                _id: '648a45e5f0123c45678d9012',
-                name: 'Roadster 6000',
-                brand: 'SpeedX',
-                price: 400,
-                type: 'Road',
-                description: 'A premium road bike designed for speed and performance.',
-                quantity: 20,
-                inStock: true,
-                createdAt: '2024-11-19T10:23:45.123Z',
-                updatedAt: '2024-11-19T10:23:45.123Z',
-            },
-        ],
-    });
-});
+router.post('/', product_controllers_1.productControllers.createProduct);
+router.get('/', product_controllers_1.productControllers.getAllProducts);
 exports.productRoutes = router;
