@@ -6,7 +6,7 @@
 		"name": "Nazmul Hassan",
 		"email": "nazmulnhb@gmail.com"
 	},
-	"main": "src/server.ts",
+	"main": "dist/server.js",
 	"scripts": {
 		"build": "rimraf dist && tsc",
 		"dev": "nodemon",
