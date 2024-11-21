@@ -47,9 +47,21 @@ const updateProductInDB = (id, update) => __awaiter(void 0, void 0, void 0, func
     const result = yield product_model_1.Product.findOneAndUpdate(...updateArgs);
     return result;
 });
+/**
+ * Marks a product as deleted in the database by setting the `isDeleted` flag to `true`.
+ *
+ * @param id Accepts custom product ID to identify a product.
+ * @returns Returns updated (mark as deleted) product data from MongoDB if updates any.
+ */
+const deleteProductFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield product_model_1.Product.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+    console.log(result);
+    return result;
+});
 exports.default = {
     saveProductToDB,
     getAllProductsFromDB,
     getSingleProductFromDB,
     updateProductInDB,
+    deleteProductFromDB,
 };

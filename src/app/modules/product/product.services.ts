@@ -58,9 +58,28 @@ const updateProductInDB = async (
 	return result;
 };
 
+/**
+ * Marks a product as deleted in the database by setting the `isDeleted` flag to `true`.
+ *
+ * @param id Accepts custom product ID to identify a product.
+ * @returns Returns updated (mark as deleted) product data from MongoDB if updates any.
+ */
+const deleteProductFromDB = async (
+	id: ObjectId,
+): Promise<TProductDocument | null> => {
+	const result = await Product.findByIdAndUpdate(
+		id,
+		{ isDeleted: true },
+		{ new: true },
+	);
+	console.log(result);
+	return result;
+};
+
 export default {
 	saveProductToDB,
 	getAllProductsFromDB,
 	getSingleProductFromDB,
 	updateProductInDB,
+	deleteProductFromDB,
 };

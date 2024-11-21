@@ -116,9 +116,37 @@ const updateProduct = async (
 	}
 };
 
+/**
+ * Mark a product as deleted by ID
+ */
+const deleteProduct = async (
+	req: Request<{ id: ObjectId }>,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const { id } = req.params;
+
+        const deleted = await productServices.deleteProductFromDB(id);
+        
+		if (deleted) {
+			return res.status(200).json({
+				status: true,
+				message: `Bicycle deleted successfully!`,
+				data: {},
+			});
+		} else {
+			throw new Error('Cannot delete specified bicycle!');
+		}
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const productControllers = {
 	createProduct,
 	getAllProducts,
 	getSingleProduct,
 	updateProduct,
+	deleteProduct,
 };

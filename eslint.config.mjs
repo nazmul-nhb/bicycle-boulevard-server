@@ -49,7 +49,7 @@ export default [
     },
   },
   {
-    files: ["src/**/server.ts", "src/**/configs/**/*.ts"],
+    files: ["src/app/server.ts", "src/app/configs/**/*.ts"],
     rules: {
       "no-console": "off",
     },

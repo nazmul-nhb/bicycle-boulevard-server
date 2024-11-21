@@ -99,9 +99,32 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
+/**
+ * Mark a product as deleted by ID
+ */
+const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const deleted = yield product_services_1.default.deleteProductFromDB(id);
+        if (deleted) {
+            return res.status(200).json({
+                status: true,
+                message: `Bicycle deleted successfully!`,
+                data: {},
+            });
+        }
+        else {
+            throw new Error('Cannot delete specified bicycle!');
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.productControllers = {
     createProduct,
     getAllProducts,
     getSingleProduct,
     updateProduct,
+    deleteProduct,
 };
