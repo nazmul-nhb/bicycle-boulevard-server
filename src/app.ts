@@ -1,8 +1,9 @@
 import cors from 'cors';
 import express from 'express';
-import type { Application, NextFunction, Request, Response } from 'express';
-import type { ErrorWithStatus } from './app/types/interfaces';
 import utilities from './app/utilities';
+import type { ErrorWithStatus } from './app/types/interfaces';
+import type { Application, NextFunction, Request, Response } from 'express';
+import { productRoutes } from './app/modules/product/product.routes';
 
 const app: Application = express();
 
@@ -18,6 +19,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 // Application Routes
+app.use('/api/products', productRoutes);
 
 // Error handler for 404
 app.use((req: Request, _res: Response, next: NextFunction) => {
