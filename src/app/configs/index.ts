@@ -44,7 +44,6 @@ export const connectDB = async (): Promise<void> => {
 };
 
 export default {
-	port: process.env.PORT as string,
-	saltRounds: process.env.SALT_ROUNDS as string,
+	port: process.env.PORT || 4242,
 	connectDB,
 };
