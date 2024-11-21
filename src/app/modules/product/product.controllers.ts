@@ -4,8 +4,9 @@ import type {
 	TCreateProduct,
 	TProduct,
 	TSingleProduct,
+	TUpdateProduct,
 } from './product.interfaces';
-import { zodProductSchema } from './product.validation';
+import { zodProduct } from './product.validation';
 import productServices from './product.services';
 import { ObjectId } from 'mongoose';
 
@@ -19,7 +20,7 @@ const createProduct = async (
 	next: NextFunction,
 ): Promise<Response<TCreateProduct> | void> => {
 	try {
-		const product = zodProductSchema.parse(req.body);
+		const product = zodProduct.creationSchema.parse(req.body);
 
 		const result = await productServices.saveProductToDB(product);
 
@@ -85,8 +86,39 @@ const getSingleProduct = async (
 	}
 };
 
+/**
+ *
+ * Update a specific product (bicycle) by id
+ */
+const updateProduct = async (
+	req: Request<{ id: ObjectId }, {}, TUpdateProduct>,
+	res: Response<TSingleProduct>,
+	next: NextFunction,
+): Promise<Response<TSingleProduct> | void> => {
+	try {
+		const { id } = req.params;
+
+		const update = zodProduct.updateSchema.parse(req.body);
+
+		const product = await productServices.updateProductInDB(id, update);
+
+		if (product) {
+			return res.status(200).json({
+				status: true,
+				message: `Bicycle updated successfully!`,
+				data: product,
+			});
+		} else {
+			throw new Error('Cannot update specified bicycle!');
+		}
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const productControllers = {
 	createProduct,
 	getAllProducts,
 	getSingleProduct,
+	updateProduct,
 };

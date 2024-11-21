@@ -1,5 +1,9 @@
 import { ObjectId } from 'mongoose';
-import type { TProduct, TProductDocument } from './product.interfaces';
+import type {
+	TProduct,
+	TProductDocument,
+	TUpdateProduct,
+} from './product.interfaces';
 import { Product } from './product.model';
 
 /**
@@ -14,7 +18,7 @@ const saveProductToDB = async (
 
 	const result = await product.save();
 
-    return result;
+	return result;
 };
 
 /**
@@ -29,7 +33,7 @@ const getAllProductsFromDB = async (): Promise<TProductDocument[]> => {
 /**
  *
  * @param id Accepts MongoDB ObjectId for a product (bicycle)
- * @returns Returns matched student data from MongoDB or nothing
+ * @returns Returns matched product data from MongoDB or nothing
  */
 const getSingleProductFromDB = async (
 	id: ObjectId,
@@ -38,8 +42,25 @@ const getSingleProductFromDB = async (
 	return result;
 };
 
+/**
+ *
+ * @param id Accepts MongoDB ObjectId for a product (bicycle)
+ * @returns Returns updated product data from MongoDB if updates any
+ */
+const updateProductInDB = async (
+	id: ObjectId,
+	update: TUpdateProduct,
+): Promise<TProductDocument | null> => {
+	const updateArgs = [{ _id: id }, update, { new: true, upsert: true }];
+
+	const result = await Product.findOneAndUpdate(...updateArgs);
+
+	return result;
+};
+
 export default {
 	saveProductToDB,
 	getAllProductsFromDB,
 	getSingleProductFromDB,
+	updateProductInDB,
 };

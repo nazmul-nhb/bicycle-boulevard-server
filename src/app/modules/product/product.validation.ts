@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const zodProductSchema = z.object({
+const creationSchema = z.object({
 	name: z
 		.string({ message: 'Name of the product is required!' })
 		.min(1, { message: 'Product name must not be empty!' }),
@@ -32,3 +32,18 @@ export const zodProductSchema = z.object({
 			message: 'Stock value must be a boolean (true or false)!',
 		}),
 });
+
+const updateSchema = z.object({
+	price: z
+		.number({ message: 'Price of the product is required!' })
+		.min(0, { message: 'Price must be a positive number!' }),
+
+	quantity: z
+		.number({ message: 'Quantity of the product is required!' })
+		.min(0, { message: 'Quantity must be a non-negative number!' }),
+});
+
+export const zodProduct = {
+	creationSchema,
+	updateSchema,
+};
