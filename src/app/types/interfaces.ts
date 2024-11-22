@@ -2,7 +2,7 @@ export interface ErrorWithStatus extends Error {
 	status?: number;
 }
 
-export interface MongoError {
+export interface MongoDuplicateError {
 	errorResponse: {
 		index: number;
 		code: number;

@@ -36,6 +36,6 @@ app.use((error, req, res, next) => {
     if (res.headersSent) {
         return next(error);
     }
-    res.status((error === null || error === void 0 ? void 0 : error.status) || 500).json(unifiedError.toResponse());
+    res.status((error === null || error === void 0 ? void 0 : error.status) || 500).json(unifiedError.parseErrors());
 });
 exports.default = app;

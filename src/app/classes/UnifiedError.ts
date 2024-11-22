@@ -1,5 +1,7 @@
 import { ZodError } from 'zod';
-import type { MongoError, ParserError } from '../types/interfaces';
+import type { MongoDuplicateError, ParserError } from '../types/interfaces';
+import type { CastError } from 'mongoose';
+import { MongooseError } from 'mongoose';
 
 interface FieldError {
 	message: string;
@@ -20,34 +22,47 @@ interface UnifiedErrorResponse {
 	stack: string;
 }
 
+/**	 *
+ * Create an instance of UnifiedError and methods to receive error response
+ *
+ * @param error Error as unknown type
+ * @param input The input fields as object from `req.body` if there is any
+ */
 export class UnifiedError {
-	private error: unknown;
-	private input: Record<string, any> | null = null;
+	private _error: unknown;
+	private _input: Record<string, any> | null = null;
 
 	constructor(error: unknown, input: Record<string, any> | null = null) {
-		this.error = error;
-		this.input = input; // Save original input if provided
+		this._error = error;
+		this._input = input;
 	}
 
 	/**
 	 * Converts various errors into a unified error response.
 	 */
-	public toResponse(): UnifiedErrorResponse {
-		if (this.error instanceof ZodError) {
-			return this.processZodError(this.error);
-		} else if (this.isMongoError(this.error)) {
-			return this.processMongoError(this.error);
-		} else if (this.isParserError(this.error)) {
-			return this.processParserError(this.error);
-		} else if (this.error instanceof Error) {
-			return this.processGenericError(this.error);
+	public parseErrors(): UnifiedErrorResponse {
+		if (this._error instanceof ZodError) {
+			return this._processZodError(this._error);
+		} else if (this._isMongoDuplicateError(this._error)) {
+			return this._processMongoDuplicateError(this._error);
+		} else if (this._isMongoCastError(this._error)) {
+			return this._processMongoCastError(this._error);
+		} else if (this._isParserError(this._error)) {
+			return this._processParserError(this._error);
+		} else if (this._error instanceof Error) {
+			return this._processGenericError(this._error);
 		}
 
-		return this.processUnknownError();
+		return this._processUnknownError();
 	}
 
-	// Handle Zod errors
-	private processZodError(error: ZodError): UnifiedErrorResponse {
+	/**
+	 * Handle Zod Errors
+	 *
+	 * @param error Accepts instance of ZodError
+	 * @returns Unified error response
+	 */
+	private _processZodError(error: ZodError): UnifiedErrorResponse {
 		const fieldErrors: Record<string, FieldError> = {};
 
 		for (const err of error.errors) {
@@ -56,18 +71,18 @@ export class UnifiedError {
 
 			// Extract the invalid value from the original input using the path
 			const invalidValue =
-				this.input &&
+				this._input &&
 				path
 					.split('.')
 					.reduce(
 						(obj, key) => (obj ? obj[key] : undefined),
-						this.input,
+						this._input,
 					);
 
 			if (err.code === 'invalid_type') {
 				fieldErrors[path] = {
-					message: `Expected ${err.expected} for “${path}” but got ${err.received}!`,
-					name: 'zodValidatorError',
+					message: `Expected '${err.expected}' for “${path}” but received '${err.received}'!`,
+					name: 'ValidatorError',
 					properties: {
 						expected: err.expected,
 						received: err.received,
@@ -93,23 +108,30 @@ export class UnifiedError {
 		}
 
 		return {
-			message: 'Validation failed',
+			message: 'Validation failed!',
 			success: false,
 			error: {
 				name: error.name,
 				errors: fieldErrors,
 			},
-			stack: this.generateStackTrace(error.stack),
+			stack: this._generateStackTrace(error.stack),
 		};
 	}
 
-	// Handle MongoDB duplicate key errors
-	private processMongoError(error: MongoError): UnifiedErrorResponse {
+	/**
+	 * Handle MongoDB duplicate error
+	 *
+	 * @param error Accepts MongoDB duplicate error
+	 * @returns Unified error response
+	 */
+	private _processMongoDuplicateError(
+		error: MongoDuplicateError,
+	): UnifiedErrorResponse {
 		const key = Object.keys(error.keyValue)[0];
 		const value = error.keyValue[key];
 
 		return {
-			message: 'Duplicate key error',
+			message: 'Duplicate Key Error',
 			success: false,
 			error: {
 				name: 'MongoError',
@@ -124,12 +146,47 @@ export class UnifiedError {
 					},
 				},
 			},
-			stack: this.generateStackTrace(),
+			stack: this._generateStackTrace(),
 		};
 	}
 
-	// Handle JSON Parser errors
-	private processParserError(error: ParserError): UnifiedErrorResponse {
+	/**
+	 * Handle MongoDB cast error
+	 *
+	 * @param error Accepts MongoDB CastError
+	 * @returns Unified error response
+	 */
+	private _processMongoCastError(error: CastError): UnifiedErrorResponse {
+		return {
+			message: 'BSONError: Invalid ObjectId',
+			success: false,
+			error: {
+				name: 'MongoDBCastError',
+				errors: {
+					[error.path]: {
+						message: `Invalid ObjectId: ${error.value}`,
+						name: error.name,
+						properties: {
+							message: `Invalid ObjectId: ${error.value}`,
+							type: error.kind,
+						},
+						kind: error.kind,
+						path: error.path,
+						value: error.value,
+					},
+				},
+			},
+			stack: this._generateStackTrace(error.stack),
+		};
+	}
+
+	/**
+	 * Handle JSON Parser errors
+	 *
+	 * @param error Accepts express parser error
+	 * @returns Unified error response
+	 */
+	private _processParserError(error: ParserError): UnifiedErrorResponse {
 		return {
 			message: 'Invalid JSON payload',
 			success: false,
@@ -146,12 +203,17 @@ export class UnifiedError {
 					},
 				},
 			},
-			stack: this.generateStackTrace(),
+			stack: this._generateStackTrace(),
 		};
 	}
 
-	// Handle generic errors
-	private processGenericError(error: Error): UnifiedErrorResponse {
+	/**
+	 * Handle generic errors
+	 *
+	 * @param error Accepts instance of Error
+	 * @returns Unified error response
+	 */
+	private _processGenericError(error: Error): UnifiedErrorResponse {
 		return {
 			message: error.message || 'An error occurred',
 			success: false,
@@ -159,12 +221,16 @@ export class UnifiedError {
 				name: error.name || 'Error',
 				errors: {},
 			},
-			stack: this.generateStackTrace(error.stack),
+			stack: this._generateStackTrace(error.stack),
 		};
 	}
 
-	// Handle unknown errors
-	private processUnknownError(): UnifiedErrorResponse {
+	/**
+	 * Handle unknown errors
+	 *
+	 * @returns Unified error response
+	 */
+	private _processUnknownError(): UnifiedErrorResponse {
 		return {
 			message: 'An unknown error occurred',
 			success: false,
@@ -172,12 +238,17 @@ export class UnifiedError {
 				name: 'UnknownError',
 				errors: {},
 			},
-			stack: this.generateStackTrace(),
+			stack: this._generateStackTrace(),
 		};
 	}
 
-	// Generate a stack trace if one doesn't exist
-	private generateStackTrace(existingStack?: string): string {
+	/**
+	 * Generate a stack trace if one doesn't exist
+	 *
+	 * @param existingStack Accepts optional existing error stack if there is any
+	 * @returns Error stack
+	 */
+	private _generateStackTrace(existingStack?: string): string {
 		if (existingStack) {
 			// Regex to extract relevant parts of the stack trace
 			const match = existingStack.match(/at (.*?)(?:\n|$)/g);
@@ -189,11 +260,15 @@ export class UnifiedError {
 		}
 
 		const fallbackError = new Error();
-		return fallbackError.stack || 'No stack trace available';
+		return fallbackError.stack || 'No stack trace available!';
 	}
 
-	// Helper methods to check error types
-	private isMongoError(error: any): error is MongoError {
+	/**
+	 * Helper method to check MongoDB duplicate error
+	 *
+	 * @param error Accepts any error
+	 */
+	private _isMongoDuplicateError(error: any): error is MongoDuplicateError {
 		return (
 			typeof error === 'object' &&
 			error?.code === 11000 &&
@@ -201,7 +276,21 @@ export class UnifiedError {
 		);
 	}
 
-	private isParserError(error: any): error is ParserError {
+	/**
+	 * Helper method to check MongoDB cast error
+	 *
+	 * @param error Accepts any error
+	 */
+	private _isMongoCastError(error: any): error is CastError {
+		return error?.name === 'CastError' && error instanceof MongooseError;
+	}
+
+	/**
+	 * Helper method to check Express Parser error
+	 *
+	 * @param error Accepts any error
+	 */
+	private _isParserError(error: any): error is ParserError {
 		return (
 			typeof error === 'object' && error?.type === 'entity.parse.failed'
 		);

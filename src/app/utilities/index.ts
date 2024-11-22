@@ -1,7 +1,7 @@
 import { ZodError } from 'zod';
 import type {
 	ErrorWithStatus,
-	MongoError,
+	MongoDuplicateError,
 	ParserError,
 } from '../types/interfaces';
 
@@ -23,10 +23,10 @@ const processErrorMsgs = (error: unknown): string => {
 			.join('; ');
 	} else if (
 		// Process MongoDB Duplicate Error
-		'code' in (error as MongoError) &&
-		(error as MongoError).code === 11000
+		'code' in (error as MongoDuplicateError) &&
+		(error as MongoDuplicateError).code === 11000
 	) {
-		const mongoError = error as MongoError;
+		const mongoError = error as MongoDuplicateError;
 		const path = Object.keys(mongoError.keyValue)[0];
 
 		return `Duplicate “${path}” Found for “${mongoError.keyValue[path]}”!`;
