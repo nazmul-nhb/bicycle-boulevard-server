@@ -5,10 +5,10 @@ import type {
 	TProduct,
 	TSingleProduct,
 	TUpdateProduct,
-} from './product.interfaces';
+} from './product.types';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
-import { ObjectId } from 'mongoose';
+import type { ObjectId } from 'mongoose';
 
 /**
  *
@@ -20,15 +20,15 @@ const createProduct = async (
 	next: NextFunction,
 ): Promise<Response<TCreateProduct> | void> => {
 	try {
-		const product = zodProduct.creationSchema.parse(req.body);
+		const productData = zodProduct.creationSchema.parse(req.body);
 
-		const result = await productServices.saveProductToDB(product);
+		const product = await productServices.saveProductToDB(productData);
 
-		if (result) {
+		if (product) {
 			return res.status(201).json({
 				success: true,
 				message: `Bicycle created successfully!`,
-				data: result,
+				data: product,
 			});
 		}
 	} catch (error) {
@@ -127,8 +127,8 @@ const deleteProduct = async (
 	try {
 		const { id } = req.params;
 
-        const deleted = await productServices.deleteProductFromDB(id);
-        
+		const deleted = await productServices.deleteProductFromDB(id);
+
 		if (deleted) {
 			return res.status(200).json({
 				status: true,

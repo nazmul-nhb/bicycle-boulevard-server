@@ -1,9 +1,9 @@
-import { ObjectId } from 'mongoose';
+import type { ObjectId } from 'mongoose';
 import type {
 	TProduct,
 	TProductDocument,
 	TUpdateProduct,
-} from './product.interfaces';
+} from './product.types';
 import { Product } from './product.model';
 
 /**
@@ -72,7 +72,7 @@ const deleteProductFromDB = async (
 		{ isDeleted: true },
 		{ new: true },
 	);
-	console.log(result);
+
 	return result;
 };
 

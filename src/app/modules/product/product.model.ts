@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import type { TProductDocument } from './product.interfaces';
+import type { TProductDocument } from './product.types';
 
 const productSchema = new Schema<TProductDocument>(
 	{
@@ -24,7 +24,6 @@ const productSchema = new Schema<TProductDocument>(
 			type: String,
 			enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
 			required: [true, 'Product type is required!'],
-			trim: true,
 		},
 		description: {
 			type: String,

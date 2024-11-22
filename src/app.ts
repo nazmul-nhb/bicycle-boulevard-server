@@ -46,6 +46,7 @@ app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
 	res.status((error as ErrorWithStatus)?.status || 500).json({
 		success: false,
 		message: errorMessage,
+		error,
 	});
 });
 

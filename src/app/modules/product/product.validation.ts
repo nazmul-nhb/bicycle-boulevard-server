@@ -3,10 +3,12 @@ import { z } from 'zod';
 const creationSchema = z.object({
 	name: z
 		.string({ message: 'Name of the product is required!' })
+		.trim()
 		.min(1, { message: 'Product name must not be empty!' }),
 
 	brand: z
 		.string({ message: 'Brand of the product is required!' })
+		.trim()
 		.min(1, { message: 'Product brand must not be empty!' }),
 
 	price: z
@@ -20,6 +22,7 @@ const creationSchema = z.object({
 
 	description: z
 		.string({ message: 'Description of the product is required!' })
+		.trim()
 		.min(1, { message: 'Product description must not be empty!' }),
 
 	quantity: z
@@ -31,6 +34,7 @@ const creationSchema = z.object({
 		.refine((val) => typeof val === 'boolean', {
 			message: 'Stock value must be a boolean (true or false)!',
 		}),
+	isDeleted: z.boolean().default(false),
 });
 
 const updateSchema = z.object({
