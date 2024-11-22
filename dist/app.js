@@ -7,6 +7,7 @@ const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const utilities_1 = __importDefault(require("./app/utilities"));
 const product_routes_1 = require("./app/modules/product/product.routes");
+const UnifiedError_1 = require("./app/classes/UnifiedError");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -26,16 +27,15 @@ app.use((req, _res, next) => {
     next(error);
 });
 // Global Error Handler
-app.use((error, _req, res, next) => {
+app.use((error, req, res, next) => {
     const errorMessage = utilities_1.default.processErrorMsgs(error);
     console.error('🛑 Error: ' + errorMessage);
+    const inputData = req.body || null;
+    const unifiedError = new UnifiedError_1.UnifiedError(error, inputData);
     // Delegate to the default Express error handler if the headers have already been sent to the client
     if (res.headersSent) {
         return next(error);
     }
-    res.status((error === null || error === void 0 ? void 0 : error.status) || 500).json({
-        success: false,
-        message: errorMessage,
-    });
+    res.status((error === null || error === void 0 ? void 0 : error.status) || 500).json(unifiedError.toResponse());
 });
 exports.default = app;

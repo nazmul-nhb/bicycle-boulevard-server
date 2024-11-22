@@ -50,8 +50,10 @@ export default [
   },
   {
     files: ["src/server.ts", "src/app/configs/**/*.ts"],
-    rules: {
-      "no-console": "off",
-    },
+    rules: { "no-console": "off" },
   },
+  {
+    files: ['src/app/classes/**/*.ts'],
+    rules: { "@typescript-eslint/no-explicit-any": "off" }
+  }
 ];

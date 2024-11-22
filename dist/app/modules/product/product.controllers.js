@@ -21,13 +21,13 @@ const product_services_1 = __importDefault(require("./product.services"));
  */
 const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = product_validation_1.zodProduct.creationSchema.parse(req.body);
-        const result = yield product_services_1.default.saveProductToDB(product);
-        if (result) {
+        const productData = product_validation_1.zodProduct.creationSchema.parse(req.body);
+        const product = yield product_services_1.default.saveProductToDB(productData);
+        if (product) {
             return res.status(201).json({
                 success: true,
                 message: `Bicycle created successfully!`,
-                data: result,
+                data: product,
             });
         }
     }

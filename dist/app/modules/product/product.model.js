@@ -24,7 +24,6 @@ const productSchema = new mongoose_1.Schema({
         type: String,
         enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
         required: [true, 'Product type is required!'],
-        trim: true,
     },
     description: {
         type: String,

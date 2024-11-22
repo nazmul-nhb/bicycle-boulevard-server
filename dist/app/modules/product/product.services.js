@@ -55,7 +55,6 @@ const updateProductInDB = (id, update) => __awaiter(void 0, void 0, void 0, func
  */
 const deleteProductFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield product_model_1.Product.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
-    console.log(result);
     return result;
 });
 exports.default = {

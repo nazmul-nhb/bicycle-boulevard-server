@@ -5,9 +5,11 @@ const zod_1 = require("zod");
 const creationSchema = zod_1.z.object({
     name: zod_1.z
         .string({ message: 'Name of the product is required!' })
+        .trim()
         .min(1, { message: 'Product name must not be empty!' }),
     brand: zod_1.z
         .string({ message: 'Brand of the product is required!' })
+        .trim()
         .min(1, { message: 'Product brand must not be empty!' }),
     price: zod_1.z
         .number({ message: 'Price of the product is required!' })
@@ -17,6 +19,7 @@ const creationSchema = zod_1.z.object({
     }),
     description: zod_1.z
         .string({ message: 'Description of the product is required!' })
+        .trim()
         .min(1, { message: 'Product description must not be empty!' }),
     quantity: zod_1.z
         .number({ message: 'Quantity of the product is required!' })
@@ -26,6 +29,7 @@ const creationSchema = zod_1.z.object({
         .refine((val) => typeof val === 'boolean', {
         message: 'Stock value must be a boolean (true or false)!',
     }),
+    isDeleted: zod_1.z.boolean().default(false),
 });
 const updateSchema = zod_1.z.object({
     price: zod_1.z

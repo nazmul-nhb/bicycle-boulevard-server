@@ -4,6 +4,7 @@ import utilities from './app/utilities';
 import type { ErrorWithStatus } from './app/types/interfaces';
 import type { Application, NextFunction, Request, Response } from 'express';
 import { productRoutes } from './app/modules/product/product.routes';
+import { UnifiedError } from './app/classes/UnifiedError';
 
 const app: Application = express();
 
@@ -33,21 +34,22 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 });
 
 // Global Error Handler
-app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 	const errorMessage = utilities.processErrorMsgs(error);
 
 	console.error('🛑 Error: ' + errorMessage);
+
+	const inputData = req.body || null;
+	const unifiedError = new UnifiedError(error, inputData);
 
 	// Delegate to the default Express error handler if the headers have already been sent to the client
 	if (res.headersSent) {
 		return next(error);
 	}
 
-	res.status((error as ErrorWithStatus)?.status || 500).json({
-		success: false,
-		message: errorMessage,
-		error,
-	});
+	res.status((error as ErrorWithStatus)?.status || 500).json(
+		unifiedError.toResponse(),
+	);
 });
 
 export default app;
