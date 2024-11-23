@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
+const mongoose_1 = require("mongoose");
 /**
  *
  * @param error Accepts an error of unknown type
@@ -22,20 +23,22 @@ const processErrorMsgs = (error) => {
     // Process MongoDB Duplicate Error
     'code' in error &&
         error.code === 11000) {
-        const mongoError = error;
-        const path = Object.keys(mongoError.keyValue)[0];
-        return `Duplicate “${path}” Found for “${mongoError.keyValue[path]}”!`;
+        const duplicateError = error;
+        const path = Object.keys(duplicateError.keyValue)[0];
+        return `Duplicate “${path}” Found for “${duplicateError.keyValue[path]}”!`;
+    }
+    else if (error instanceof mongoose_1.MongooseError) {
+        return `Invalid ObjectId: ${error.value}`;
     }
     else if (
     // Process Express Body Parser Error
     'type' in error &&
         error.type === 'entity.parse.failed') {
-        return 'Please, Send Data in Valid JSON Format!';
+        return 'Invalid JSON Payload!';
     }
     else {
         // Process General Error
-        const generalError = error;
-        return generalError.message;
+        return error.message;
     }
 };
 exports.default = {

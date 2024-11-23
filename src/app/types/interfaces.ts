@@ -1,8 +1,4 @@
-export interface ErrorWithStatus extends Error {
-	status?: number;
-}
-
-export interface MongoDuplicateError {
+export interface IMongoDuplicateError {
 	errorResponse: {
 		index: number;
 		code: number;
@@ -16,7 +12,7 @@ export interface MongoDuplicateError {
 	keyValue: Record<string, string>;
 }
 
-export interface ParserError {
+export interface IParserError {
 	expose: boolean;
 	statusCode: number;
 	status: number;

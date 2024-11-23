@@ -1,14 +1,15 @@
 import { ZodError } from 'zod';
-import type { MongoDuplicateError, ParserError } from '../types/interfaces';
+import type { IMongoDuplicateError, IParserError } from '../types/interfaces';
 import type { CastError } from 'mongoose';
 import { MongooseError } from 'mongoose';
+import { ErrorWithStatus } from './ErrorWithStatus';
 
 interface FieldError {
 	message: string;
 	name: string;
 	properties: Record<string, any>;
 	kind: string;
-	path: string;
+	path?: string;
 	value?: unknown;
 }
 
@@ -125,7 +126,7 @@ export class UnifiedError {
 	 * @returns Unified error response
 	 */
 	private _processMongoDuplicateError(
-		error: MongoDuplicateError,
+		error: IMongoDuplicateError,
 	): UnifiedErrorResponse {
 		const key = Object.keys(error.keyValue)[0];
 		const value = error.keyValue[key];
@@ -186,7 +187,7 @@ export class UnifiedError {
 	 * @param error Accepts express parser error
 	 * @returns Unified error response
 	 */
-	private _processParserError(error: ParserError): UnifiedErrorResponse {
+	private _processParserError(error: IParserError): UnifiedErrorResponse {
 		return {
 			message: 'Invalid JSON payload',
 			success: false,
@@ -214,12 +215,50 @@ export class UnifiedError {
 	 * @returns Unified error response
 	 */
 	private _processGenericError(error: Error): UnifiedErrorResponse {
+		if (this._isErrorWithStatus(error)) {
+			// Specific handling for 404 Not Found errors
+			if (error.status === 404) {
+				return {
+					message: 'Resource Not Found!',
+					success: false,
+					error: {
+						name: error.name || 'NotFoundError',
+						errors: {
+							endpoint: {
+								message: error.message,
+								name: error.name || 'NotFoundError',
+								properties: {
+									message: error.message,
+									type: error.type,
+								},
+								kind: error.type,
+								path: 'unknown',
+								value: error.value,
+							},
+						},
+					},
+					stack: this._generateStackTrace(error.stack),
+				};
+			}
+		}
+		// Generic error fallback
 		return {
 			message: error.message || 'An error occurred',
 			success: false,
 			error: {
 				name: error.name || 'Error',
-				errors: {},
+				errors: {
+					unknown: {
+						message: error.message || 'An error occurred',
+						name: 'Error',
+						properties: {
+							type: 'generic',
+						},
+						kind: 'generic_error',
+						path: 'unknown',
+						value: 'unknown',
+					},
+				},
 			},
 			stack: this._generateStackTrace(error.stack),
 		};
@@ -268,7 +307,7 @@ export class UnifiedError {
 	 *
 	 * @param error Accepts any error
 	 */
-	private _isMongoDuplicateError(error: any): error is MongoDuplicateError {
+	private _isMongoDuplicateError(error: any): error is IMongoDuplicateError {
 		return (
 			typeof error === 'object' &&
 			error?.code === 11000 &&
@@ -290,9 +329,18 @@ export class UnifiedError {
 	 *
 	 * @param error Accepts any error
 	 */
-	private _isParserError(error: any): error is ParserError {
+	private _isParserError(error: any): error is IParserError {
 		return (
 			typeof error === 'object' && error?.type === 'entity.parse.failed'
 		);
+	}
+
+	/**
+	 * Helper method to check error with status code
+	 *
+	 * @param error Accepts any error
+	 */
+	private _isErrorWithStatus(error: any): error is ErrorWithStatus {
+		return error instanceof ErrorWithStatus;
 	}
 }

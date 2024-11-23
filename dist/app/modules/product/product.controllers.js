@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productControllers = void 0;
 const product_validation_1 = require("./product.validation");
 const product_services_1 = __importDefault(require("./product.services"));
+const ErrorWithStatus_1 = require("../../classes/ErrorWithStatus");
 /**
  *
  * Create a new product (bicycle)
@@ -68,7 +69,8 @@ const getSingleProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             });
         }
         else {
-            throw new Error('No bicycle matched with the given ID!');
+            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('ProductNotFoundError', `No bicycle matched with ${id}!`, 404, 'not_found', 'product');
+            next(notFoundError);
         }
     }
     catch (error) {

@@ -9,6 +9,7 @@ import type {
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
 import type { ObjectId } from 'mongoose';
+import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 
 /**
  *
@@ -79,7 +80,14 @@ const getSingleProduct = async (
 				data: product,
 			});
 		} else {
-			throw new Error('No bicycle matched with the given ID!');
+			const notFoundError = new ErrorWithStatus(
+				'ProductNotFoundError',
+				`No bicycle matched with ${id}!`,
+				404,
+				'not_found',
+				'product',
+			);
+			next(notFoundError);
 		}
 	} catch (error) {
 		next(error);

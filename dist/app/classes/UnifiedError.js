@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnifiedError = void 0;
 const zod_1 = require("zod");
 const mongoose_1 = require("mongoose");
+const ErrorWithStatus_1 = require("./ErrorWithStatus");
 /**	 *
  * Create an instance of UnifiedError and methods to receive error response
  *
@@ -180,12 +181,50 @@ class UnifiedError {
      * @returns Unified error response
      */
     _processGenericError(error) {
+        if (this._isErrorWithStatus(error)) {
+            // Specific handling for 404 Not Found errors
+            if (error.status === 404) {
+                return {
+                    message: 'Resource Not Found!',
+                    success: false,
+                    error: {
+                        name: error.name || 'NotFoundError',
+                        errors: {
+                            endpoint: {
+                                message: error.message,
+                                name: error.name || 'NotFoundError',
+                                properties: {
+                                    message: error.message,
+                                    type: error.type,
+                                },
+                                kind: error.type,
+                                path: 'unknown',
+                                value: error.value,
+                            },
+                        },
+                    },
+                    stack: this._generateStackTrace(error.stack),
+                };
+            }
+        }
+        // Generic error fallback
         return {
             message: error.message || 'An error occurred',
             success: false,
             error: {
                 name: error.name || 'Error',
-                errors: {},
+                errors: {
+                    unknown: {
+                        message: error.message || 'An error occurred',
+                        name: 'Error',
+                        properties: {
+                            type: 'generic',
+                        },
+                        kind: 'generic_error',
+                        path: 'unknown',
+                        value: 'unknown',
+                    },
+                },
             },
             stack: this._generateStackTrace(error.stack),
         };
@@ -250,6 +289,14 @@ class UnifiedError {
      */
     _isParserError(error) {
         return (typeof error === 'object' && (error === null || error === void 0 ? void 0 : error.type) === 'entity.parse.failed');
+    }
+    /**
+     * Helper method to check error with status code
+     *
+     * @param error Accepts any error
+     */
+    _isErrorWithStatus(error) {
+        return error instanceof ErrorWithStatus_1.ErrorWithStatus;
     }
 }
 exports.UnifiedError = UnifiedError;

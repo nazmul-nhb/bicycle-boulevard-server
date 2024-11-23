@@ -1,10 +1,7 @@
 import { ZodError } from 'zod';
-import type {
-	ErrorWithStatus,
-	MongoDuplicateError,
-	ParserError,
-} from '../types/interfaces';
-
+import type { IMongoDuplicateError, IParserError } from '../types/interfaces';
+import type { CastError } from 'mongoose';
+import { MongooseError } from 'mongoose';
 /**
  *
  * @param error Accepts an error of unknown type
@@ -23,23 +20,24 @@ const processErrorMsgs = (error: unknown): string => {
 			.join('; ');
 	} else if (
 		// Process MongoDB Duplicate Error
-		'code' in (error as MongoDuplicateError) &&
-		(error as MongoDuplicateError).code === 11000
+		'code' in (error as IMongoDuplicateError) &&
+		(error as IMongoDuplicateError).code === 11000
 	) {
-		const mongoError = error as MongoDuplicateError;
-		const path = Object.keys(mongoError.keyValue)[0];
+		const duplicateError = error as IMongoDuplicateError;
+		const path = Object.keys(duplicateError.keyValue)[0];
 
-		return `Duplicate “${path}” Found for “${mongoError.keyValue[path]}”!`;
+		return `Duplicate “${path}” Found for “${duplicateError.keyValue[path]}”!`;
+	} else if (error instanceof MongooseError) {
+		return `Invalid ObjectId: ${(error as CastError).value}`;
 	} else if (
 		// Process Express Body Parser Error
-		'type' in (error as ParserError) &&
-		(error as ParserError).type === 'entity.parse.failed'
+		'type' in (error as IParserError) &&
+		(error as IParserError).type === 'entity.parse.failed'
 	) {
-		return 'Please, Send Data in Valid JSON Format!';
+		return 'Invalid JSON Payload!';
 	} else {
 		// Process General Error
-		const generalError = error as ErrorWithStatus;
-		return generalError.message;
+		return (error as Error).message;
 	}
 };
 

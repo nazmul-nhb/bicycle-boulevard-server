@@ -1,10 +1,10 @@
 import cors from 'cors';
 import express from 'express';
 import utilities from './app/utilities';
-import type { ErrorWithStatus } from './app/types/interfaces';
 import type { Application, NextFunction, Request, Response } from 'express';
 import { productRoutes } from './app/modules/product/product.routes';
 import { UnifiedError } from './app/classes/UnifiedError';
+import { ErrorWithStatus } from './app/classes/ErrorWithStatus';
 
 const app: Application = express();
 
@@ -24,23 +24,23 @@ app.use('/api/products', productRoutes);
 
 // Error handler for 404
 app.use((req: Request, _res: Response, next: NextFunction) => {
-	const error: ErrorWithStatus = new Error(
+	const error = new ErrorWithStatus(
+		'NotFoundError',
 		`Requested End-Point “${req.method}: ${req.url}” Not Found!`,
+		404,
+		'not_found',
+		'url',
 	);
-
-	error.status = 404;
-
 	next(error);
 });
 
 // Global Error Handler
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-	const errorMessage = utilities.processErrorMsgs(error);
+	// get unified error in structured format
+	const unifiedError = new UnifiedError(error, req.body);
 
-	console.error('🛑 Error: ' + errorMessage);
-
-	const inputData = req.body || null;
-	const unifiedError = new UnifiedError(error, inputData);
+	// Log error msg in the server console
+	console.error(`🛑 Error: ${utilities.processErrorMsgs(error)}`);
 
 	// Delegate to the default Express error handler if the headers have already been sent to the client
 	if (res.headersSent) {
