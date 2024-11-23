@@ -94,8 +94,9 @@ export class UnifiedError {
 					value: invalidValue ?? err.received,
 				};
 			} else if (err.code === 'unrecognized_keys') {
+				const keys = err.keys.join(', ');
 				fieldErrors[err.code] = {
-					message: err.message,
+					message: `${err.keys.length > 1 ? 'Keys' : 'Key'}: “${keys}” Not Allowed!`,
 					name: 'ValidatorError',
 					properties: {
 						message: err.message,

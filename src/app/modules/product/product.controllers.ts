@@ -85,6 +85,7 @@ const getSingleProduct = async (
 				`No bicycle matched with id: ${id}!`,
 				404,
 				'not_found',
+				id.toString(),
 				'get_product',
 			);
 			next(notFoundError);
@@ -122,6 +123,7 @@ const updateProduct = async (
 				`Cannot update specified bicycle with id: ${id}!`,
 				404,
 				'not_found',
+				id.toString(),
 				'update_product',
 			);
 			next(notFoundError);
@@ -156,6 +158,7 @@ const deleteProduct = async (
 				`Cannot delete specified bicycle with id: ${id}!`,
 				404,
 				'not_found',
+				id.toString(),
 				'delete_product',
 			);
 			next(notFoundError);
