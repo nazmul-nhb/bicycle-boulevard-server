@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import type { Query } from 'mongoose';
 import type { TProductDocument } from './product.types';
 
 const productSchema = new Schema<TProductDocument>(
@@ -34,12 +35,17 @@ const productSchema = new Schema<TProductDocument>(
 		quantity: {
 			type: Number,
 			required: [true, 'Product quantity is required!'],
-			min: [0, 'Quantity must be a non-negative number!'], // Quantity can't be less than 0
+			min: [0, 'Quantity must be a non-negative number!'],
 		},
 		inStock: {
 			type: Boolean,
 			required: [true, 'Stock availability must be specified!'],
 			default: true,
+		},
+		isDeleted: {
+			type: Boolean,
+			required:false,
+			default: false,
 		},
 	},
 	{
@@ -47,5 +53,23 @@ const productSchema = new Schema<TProductDocument>(
 		versionKey: false,
 	},
 );
+
+// Get products that are not deleted
+productSchema.pre(/^find/, function (next) {
+	const query = this as Query<TProductDocument, TProductDocument>;
+
+	query.find({ isDeleted: { $ne: true } });
+
+	next();
+});
+
+// Remove `isDeleted` field before returning the document
+productSchema.pre(/^find/, function (next) {
+	const query = this as Query<TProductDocument, TProductDocument>;
+
+	query.find().projection({ isDeleted: 0 });
+
+	next();
+});
 
 export const Product = model<TProductDocument>('Product', productSchema);

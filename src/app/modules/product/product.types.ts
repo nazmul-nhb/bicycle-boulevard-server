@@ -6,22 +6,22 @@ export type TProduct = z.infer<typeof zodProduct.creationSchema>;
 
 export type TProductDocument = TProduct & Document;
 
-export type TUpdateProduct = z.infer<typeof zodProduct.updateSchema>;
+export type TProductNotDeleted = Omit<TProductDocument, 'isDeleted'>;
 
-export type TCreateProduct = {
+export type RCreateProduct = {
 	success: boolean;
 	message: string;
-	data: TProductDocument;
+	data: TProductNotDeleted;
 };
 
-export type TAllProducts = {
+export type RAllProducts = {
 	// TODO: After getting assignment result, rename this status to success to maintain the consistency
 	status: boolean;
 	message: string;
 	data: TProductDocument[];
 };
 
-export type TSingleProduct = {
+export type RSingleProduct = {
 	// TODO: After getting assignment result, rename this status to success to maintain the consistency
 	status: boolean;
 	message: string;

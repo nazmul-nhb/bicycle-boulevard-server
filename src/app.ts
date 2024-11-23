@@ -29,7 +29,8 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 		`Requested End-Point “${req.method}: ${req.url}” Not Found!`,
 		404,
 		'not_found',
-		'url',
+		req.url,
+		`${req.method}: ${req.url}`,
 	);
 	next(error);
 });

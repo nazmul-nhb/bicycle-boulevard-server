@@ -23,7 +23,7 @@ interface UnifiedErrorResponse {
 	stack: string;
 }
 
-/**	 *
+/**
  * Create an instance of UnifiedError and methods to receive error response
  *
  * @param error Error as unknown type
@@ -232,7 +232,7 @@ export class UnifiedError {
 									type: error.type,
 								},
 								kind: error.type,
-								path: 'unknown',
+								path: error.path,
 								value: error.value,
 							},
 						},

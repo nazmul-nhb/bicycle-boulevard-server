@@ -35,7 +35,7 @@ export default [
       ...prettierConfig.rules,
       'prettier/prettier': 'off',
       // 'no-unused-vars': 'error',
-      'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
+      'no-unused-vars': ['error', { 'varsIgnorePattern': '^_' }],
       'no-unused-expressions': 'error',
       'prefer-const': 'error',
       "no-console": ["warn", { "allow": ["warn", "error"] }],
@@ -44,8 +44,8 @@ export default [
       // '@typescript-eslint/no-unused-vars': 'error',
       // '@typescript-eslint/no-unused-expressions': 'error',
       "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/consistent-type-imports": ["warn", { "prefer": "type-imports" }]
-      // "@typescript-eslint/no-unused-vars": ["error", { 'argsIgnorePattern': '^_' }]
+      "@typescript-eslint/consistent-type-imports": ["warn", { "prefer": "type-imports" }],
+      "@typescript-eslint/no-unused-vars": ["error", { 'varsIgnorePattern': '^_' }]
     },
   },
   {

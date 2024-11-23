@@ -1,10 +1,7 @@
 import type { ObjectId } from 'mongoose';
-import type {
-	TProduct,
-	TProductDocument,
-	TUpdateProduct,
-} from './product.types';
+import type { TProduct, TProductDocument, TProductNotDeleted } from './product.types';
 import { Product } from './product.model';
+import { Types } from 'mongoose';
 
 /**
  *
@@ -13,12 +10,13 @@ import { Product } from './product.model';
  */
 const saveProductToDB = async (
 	productData: TProduct,
-): Promise<TProductDocument> => {
+): Promise<TProductNotDeleted> => {
 	const product = new Product(productData);
 
 	const result = await product.save();
 
-	return result;
+	const { isDeleted: _skip, ...resultWithoutIsDeleted } = result.toObject();
+	return resultWithoutIsDeleted as TProductNotDeleted;
 };
 
 /**
@@ -48,13 +46,15 @@ const getSingleProductFromDB = async (
  * @returns Returns updated product data from MongoDB if updates any
  */
 const updateProductInDB = async (
-	id: ObjectId,
-	update: TUpdateProduct,
+	id: string,
+	update: Partial<TProduct>,
 ): Promise<TProductDocument | null> => {
-	const updateArgs = [{ _id: id }, update, { new: true, upsert: true }];
+	const objectId = new Types.ObjectId(id);
+
+	const updateArgs = [{ _id: objectId }, update, { new: true }];
 
 	const result = await Product.findOneAndUpdate(...updateArgs);
-
+	console.log(result);
 	return result;
 };
 

@@ -1,10 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 import type {
-	TAllProducts,
-	TCreateProduct,
+	RAllProducts,
+	RCreateProduct,
 	TProduct,
-	TSingleProduct,
-	TUpdateProduct,
+	RSingleProduct,
 } from './product.types';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
@@ -17,9 +16,9 @@ import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
  */
 const createProduct = async (
 	req: Request<{}, {}, TProduct>,
-	res: Response<TCreateProduct>,
+	res: Response<RCreateProduct>,
 	next: NextFunction,
-): Promise<Response<TCreateProduct> | void> => {
+): Promise<Response<RCreateProduct> | void> => {
 	try {
 		const productData = zodProduct.creationSchema.parse(req.body);
 
@@ -43,9 +42,9 @@ const createProduct = async (
  */
 const getAllProducts = async (
 	_req: Request,
-	res: Response<TAllProducts>,
+	res: Response<RAllProducts>,
 	next: NextFunction,
-): Promise<Response<TAllProducts> | void> => {
+): Promise<Response<RAllProducts> | void> => {
 	try {
 		const products = await productServices.getAllProductsFromDB();
 
@@ -65,9 +64,9 @@ const getAllProducts = async (
  */
 const getSingleProduct = async (
 	req: Request<{ id: ObjectId }>,
-	res: Response<TSingleProduct>,
+	res: Response<RSingleProduct>,
 	next: NextFunction,
-): Promise<Response<TSingleProduct> | void> => {
+): Promise<Response<RSingleProduct> | void> => {
 	try {
 		const { id } = req.params;
 
@@ -82,10 +81,10 @@ const getSingleProduct = async (
 		} else {
 			const notFoundError = new ErrorWithStatus(
 				'ProductNotFoundError',
-				`No bicycle matched with ${id}!`,
+				`No bicycle matched with id: ${id}!`,
 				404,
 				'not_found',
-				'product',
+				'get_product',
 			);
 			next(notFoundError);
 		}
@@ -99,15 +98,15 @@ const getSingleProduct = async (
  * Update a specific product (bicycle) by id
  */
 const updateProduct = async (
-	req: Request<{ id: ObjectId }, {}, TUpdateProduct>,
-	res: Response<TSingleProduct>,
+	req: Request<{ id: string }, {}, Partial<TProduct>>,
+	res: Response<RSingleProduct>,
 	next: NextFunction,
-): Promise<Response<TSingleProduct> | void> => {
+): Promise<Response<RSingleProduct> | void> => {
 	try {
 		const { id } = req.params;
-
+console.log(req.body);
 		const update = zodProduct.updateSchema.parse(req.body);
-
+console.log(update);
 		const product = await productServices.updateProductInDB(id, update);
 
 		if (product) {
@@ -117,7 +116,14 @@ const updateProduct = async (
 				data: product,
 			});
 		} else {
-			throw new Error('Cannot update specified bicycle!');
+			const notFoundError = new ErrorWithStatus(
+				'ProductNotFoundError',
+				`Cannot update specified bicycle with id: ${id}!`,
+				404,
+				'not_found',
+				'update_product',
+			);
+			next(notFoundError);
 		}
 	} catch (error) {
 		next(error);
@@ -144,7 +150,14 @@ const deleteProduct = async (
 				data: {},
 			});
 		} else {
-			throw new Error('Cannot delete specified bicycle!');
+			const notFoundError = new ErrorWithStatus(
+				'ProductNotFoundError',
+				`Cannot delete specified bicycle with id: ${id}!`,
+				404,
+				'not_found',
+				'delete_product',
+			);
+			next(notFoundError);
 		}
 	} catch (error) {
 		next(error);
