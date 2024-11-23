@@ -4,6 +4,7 @@ import type {
 	RCreateProduct,
 	TProduct,
 	RSingleProduct,
+	TUpdateProduct,
 } from './product.types';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
@@ -98,15 +99,15 @@ const getSingleProduct = async (
  * Update a specific product (bicycle) by id
  */
 const updateProduct = async (
-	req: Request<{ id: string }, {}, Partial<TProduct>>,
+	req: Request<{ id: ObjectId }, {}, TUpdateProduct>,
 	res: Response<RSingleProduct>,
 	next: NextFunction,
 ): Promise<Response<RSingleProduct> | void> => {
 	try {
 		const { id } = req.params;
-console.log(req.body);
+
 		const update = zodProduct.updateSchema.parse(req.body);
-console.log(update);
+
 		const product = await productServices.updateProductInDB(id, update);
 
 		if (product) {

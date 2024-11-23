@@ -90,8 +90,20 @@ export class UnifiedError {
 						message: err.message,
 					},
 					kind: 'invalid_type',
-					path,
+					path: path || 'unknown',
 					value: invalidValue ?? err.received,
+				};
+			} else if (err.code === 'unrecognized_keys') {
+				fieldErrors[err.code] = {
+					message: err.message,
+					name: 'ValidatorError',
+					properties: {
+						message: err.message,
+						type: err.code,
+					},
+					kind: err.code,
+					path: path || 'all',
+					value: invalidValue ?? 'all',
 				};
 			} else {
 				fieldErrors[path] = {
@@ -102,8 +114,8 @@ export class UnifiedError {
 						type: err.code,
 					},
 					kind: err.code,
-					path,
-					value: invalidValue ?? '',
+					path: path || 'unknown',
+					value: invalidValue ?? 'unknown',
 				};
 			}
 		}
@@ -224,7 +236,7 @@ export class UnifiedError {
 					error: {
 						name: error.name || 'NotFoundError',
 						errors: {
-							endpoint: {
+							[error.type]: {
 								message: error.message,
 								name: error.name || 'NotFoundError',
 								properties: {

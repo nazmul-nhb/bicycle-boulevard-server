@@ -29,16 +29,12 @@ const creationSchema = zod_1.z.object({
         .refine((val) => typeof val === 'boolean', {
         message: 'Stock value must be a boolean (true or false)!',
     }),
-    isDeleted: zod_1.z.boolean().default(false),
+    isDeleted: zod_1.z.boolean().optional().default(false),
 });
-const updateSchema = zod_1.z.object({
-    price: zod_1.z
-        .number({ message: 'Price of the product is required!' })
-        .min(0, { message: 'Price must be a positive number!' }),
-    quantity: zod_1.z
-        .number({ message: 'Quantity of the product is required!' })
-        .min(0, { message: 'Quantity must be a non-negative number!' }),
-});
+const updateSchema = creationSchema
+    .partial()
+    .omit({ isDeleted: true })
+    .strict();
 exports.zodProduct = {
     creationSchema,
     updateSchema,

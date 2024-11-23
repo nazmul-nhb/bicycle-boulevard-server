@@ -23,7 +23,7 @@ app.get('/', (_req, res) => {
 app.use('/api/products', product_routes_1.productRoutes);
 // Error handler for 404
 app.use((req, _res, next) => {
-    const error = new ErrorWithStatus_1.ErrorWithStatus('NotFoundError', `Requested End-Point “${req.method}: ${req.url}” Not Found!`, 404, 'not_found', 'url');
+    const error = new ErrorWithStatus_1.ErrorWithStatus('NotFoundError', `Requested End-Point “${req.method}: ${req.url}” Not Found!`, 404, 'not_found', req.url, `${req.method}: ${req.url}`);
     next(error);
 });
 // Global Error Handler

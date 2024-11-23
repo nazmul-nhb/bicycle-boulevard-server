@@ -44,7 +44,7 @@ const productSchema = new Schema<TProductDocument>(
 		},
 		isDeleted: {
 			type: Boolean,
-			required:false,
+			required: false,
 			default: false,
 		},
 	},
@@ -55,19 +55,11 @@ const productSchema = new Schema<TProductDocument>(
 );
 
 // Get products that are not deleted
+// And remove `isDeleted` field before returning the document
 productSchema.pre(/^find/, function (next) {
 	const query = this as Query<TProductDocument, TProductDocument>;
 
-	query.find({ isDeleted: { $ne: true } });
-
-	next();
-});
-
-// Remove `isDeleted` field before returning the document
-productSchema.pre(/^find/, function (next) {
-	const query = this as Query<TProductDocument, TProductDocument>;
-
-	query.find().projection({ isDeleted: 0 });
+	query.find({ isDeleted: { $ne: true } }).projection({ isDeleted: 0 });
 
 	next();
 });

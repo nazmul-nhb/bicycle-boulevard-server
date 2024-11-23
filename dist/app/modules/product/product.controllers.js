@@ -69,7 +69,7 @@ const getSingleProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             });
         }
         else {
-            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('ProductNotFoundError', `No bicycle matched with ${id}!`, 404, 'not_found', 'product');
+            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('ProductNotFoundError', `No bicycle matched with id: ${id}!`, 404, 'not_found', 'get_product');
             next(notFoundError);
         }
     }
@@ -94,7 +94,8 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             });
         }
         else {
-            throw new Error('Cannot update specified bicycle!');
+            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('ProductNotFoundError', `Cannot update specified bicycle with id: ${id}!`, 404, 'not_found', 'update_product');
+            next(notFoundError);
         }
     }
     catch (error) {
@@ -116,7 +117,8 @@ const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             });
         }
         else {
-            throw new Error('Cannot delete specified bicycle!');
+            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('ProductNotFoundError', `Cannot delete specified bicycle with id: ${id}!`, 404, 'not_found', 'delete_product');
+            next(notFoundError);
         }
     }
     catch (error) {

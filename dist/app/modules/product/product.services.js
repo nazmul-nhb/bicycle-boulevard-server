@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const product_model_1 = require("./product.model");
 /**
@@ -18,7 +29,8 @@ const product_model_1 = require("./product.model");
 const saveProductToDB = (productData) => __awaiter(void 0, void 0, void 0, function* () {
     const product = new product_model_1.Product(productData);
     const result = yield product.save();
-    return result;
+    const _a = result.toObject(), { isDeleted: _skip } = _a, resultWithoutIsDeleted = __rest(_a, ["isDeleted"]);
+    return resultWithoutIsDeleted;
 });
 /**
  *
@@ -43,7 +55,7 @@ const getSingleProductFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
  * @returns Returns updated product data from MongoDB if updates any
  */
 const updateProductInDB = (id, update) => __awaiter(void 0, void 0, void 0, function* () {
-    const updateArgs = [{ _id: id }, update, { new: true, upsert: true }];
+    const updateArgs = [{ _id: id }, update, { new: true, rawResult: true }];
     const result = yield product_model_1.Product.findOneAndUpdate(...updateArgs);
     return result;
 });

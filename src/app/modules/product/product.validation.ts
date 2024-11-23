@@ -37,7 +37,10 @@ const creationSchema = z.object({
 	isDeleted: z.boolean().optional().default(false),
 });
 
-const updateSchema = creationSchema.partial();
+const updateSchema = creationSchema
+	.partial()
+	.omit({ isDeleted: true })
+	.strict();
 
 export const zodProduct = {
 	creationSchema,

@@ -4,7 +4,7 @@ exports.UnifiedError = void 0;
 const zod_1 = require("zod");
 const mongoose_1 = require("mongoose");
 const ErrorWithStatus_1 = require("./ErrorWithStatus");
-/**	 *
+/**
  * Create an instance of UnifiedError and methods to receive error response
  *
  * @param error Error as unknown type
@@ -63,8 +63,21 @@ class UnifiedError {
                         message: err.message,
                     },
                     kind: 'invalid_type',
-                    path,
+                    path: path || 'unknown',
                     value: invalidValue !== null && invalidValue !== void 0 ? invalidValue : err.received,
+                };
+            }
+            else if (err.code === 'unrecognized_keys') {
+                fieldErrors[err.code] = {
+                    message: err.message,
+                    name: 'ValidatorError',
+                    properties: {
+                        message: err.message,
+                        type: err.code,
+                    },
+                    kind: err.code,
+                    path: path || 'all',
+                    value: invalidValue !== null && invalidValue !== void 0 ? invalidValue : 'all',
                 };
             }
             else {
@@ -76,8 +89,8 @@ class UnifiedError {
                         type: err.code,
                     },
                     kind: err.code,
-                    path,
-                    value: invalidValue !== null && invalidValue !== void 0 ? invalidValue : '',
+                    path: path || 'unknown',
+                    value: invalidValue !== null && invalidValue !== void 0 ? invalidValue : 'unknown',
                 };
             }
         }
@@ -190,7 +203,7 @@ class UnifiedError {
                     error: {
                         name: error.name || 'NotFoundError',
                         errors: {
-                            endpoint: {
+                            [error.type]: {
                                 message: error.message,
                                 name: error.name || 'NotFoundError',
                                 properties: {
@@ -198,7 +211,7 @@ class UnifiedError {
                                     type: error.type,
                                 },
                                 kind: error.type,
-                                path: 'unknown',
+                                path: error.path,
                                 value: error.value,
                             },
                         },

@@ -1,7 +1,11 @@
 import type { ObjectId } from 'mongoose';
-import type { TProduct, TProductDocument, TProductNotDeleted } from './product.types';
+import type {
+	TProduct,
+	TProductDocument,
+	TProductNotDeleted,
+	TUpdateProduct,
+} from './product.types';
 import { Product } from './product.model';
-import { Types } from 'mongoose';
 
 /**
  *
@@ -46,15 +50,13 @@ const getSingleProductFromDB = async (
  * @returns Returns updated product data from MongoDB if updates any
  */
 const updateProductInDB = async (
-	id: string,
-	update: Partial<TProduct>,
+	id: ObjectId,
+	update: TUpdateProduct,
 ): Promise<TProductDocument | null> => {
-	const objectId = new Types.ObjectId(id);
-
-	const updateArgs = [{ _id: objectId }, update, { new: true }];
+	const updateArgs = [{ _id: id }, update, { new: true, rawResult: true }];
 
 	const result = await Product.findOneAndUpdate(...updateArgs);
-	console.log(result);
+
 	return result;
 };
 

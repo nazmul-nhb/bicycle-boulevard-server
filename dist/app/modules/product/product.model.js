@@ -34,15 +34,27 @@ const productSchema = new mongoose_1.Schema({
     quantity: {
         type: Number,
         required: [true, 'Product quantity is required!'],
-        min: [0, 'Quantity must be a non-negative number!'], // Quantity can't be less than 0
+        min: [0, 'Quantity must be a non-negative number!'],
     },
     inStock: {
         type: Boolean,
         required: [true, 'Stock availability must be specified!'],
         default: true,
     },
+    isDeleted: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 }, {
     timestamps: true,
     versionKey: false,
+});
+// Get products that are not deleted
+// And remove `isDeleted` field before returning the document
+productSchema.pre(/^find/, function (next) {
+    const query = this;
+    query.find({ isDeleted: { $ne: true } }).projection({ isDeleted: 0 });
+    next();
 });
 exports.Product = (0, mongoose_1.model)('Product', productSchema);
