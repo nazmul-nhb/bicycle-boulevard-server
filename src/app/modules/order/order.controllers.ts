@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { RCreateOrder, TOrder } from './order.types';
+import type { RCreateOrder, ROrderRevenue, TOrder } from './order.types';
 import { zodOrder } from './order.validation';
 import orderServices from './order.services';
 
@@ -29,4 +29,25 @@ const createOrder = async (
 	}
 };
 
-export default { createOrder };
+/**
+ * Get Revenue from Orders
+ */
+const getOrderRevenue = async (
+	_req: Request,
+	res: Response<ROrderRevenue>,
+	next: NextFunction,
+): Promise<Response<ROrderRevenue> | void> => {
+	try {
+		const totalRevenue = await orderServices.calculateOrderRevenue();
+
+		return res.status(200).json({
+			message: 'Revenue calculated successfully!',
+			status: true,
+			data: { totalRevenue },
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
+export default { createOrder, getOrderRevenue };

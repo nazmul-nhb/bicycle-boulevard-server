@@ -14,3 +14,14 @@ export type RCreateOrder = {
 	status: boolean;
 	data: TOrderDocument;
 };
+
+export type ROrderRevenue = {
+	message: string;
+	status: boolean;
+	data: { totalRevenue: number };
+};
+
+export type TCalculatedRevenue = {
+	_id: null;
+	total: number;
+};

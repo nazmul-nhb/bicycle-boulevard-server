@@ -34,4 +34,20 @@ const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
-exports.default = { createOrder };
+/**
+ * Get Revenue from Orders
+ */
+const getOrderRevenue = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const totalRevenue = yield order_services_1.default.calculateOrderRevenue();
+        return res.status(200).json({
+            message: 'Revenue calculated successfully!',
+            status: true,
+            data: { totalRevenue },
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.default = { createOrder, getOrderRevenue };

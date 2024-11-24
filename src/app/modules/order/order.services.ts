@@ -1,17 +1,41 @@
 import { Order } from './order.model';
-import type { TOrder, TOrderDocument } from './order.types';
+import type { TCalculatedRevenue, TOrder, TOrderDocument } from './order.types';
 
 /**
  *
- * @param productData Accepts product data sent from client
- * @returns Saved product from MongoDB
+ * @param orderData Accepts order data sent from client
+ * @returns Saved order from MongoDB
  */
 const saveOrderInDB = async (orderData: TOrder): Promise<TOrderDocument> => {
-	const product = new Order(orderData);
+	const order = new Order(orderData);
 
-	const result = await product.save();
+	const result = await order.save();
 
 	return result;
 };
 
-export default { saveOrderInDB };
+const calculateOrderRevenue = async (): Promise<number> => {
+	const revenue: TCalculatedRevenue[] = await Order.aggregate([
+		{
+			$lookup: {
+				from: 'products',
+				localField: 'product',
+				foreignField: '_id',
+				as: 'bicycle',
+			},
+		},
+		{ $unwind: '$bicycle' },
+		{
+			$group: {
+				_id: null,
+				total: {
+					$sum: { $multiply: ['$bicycle.price', '$quantity'] },
+				},
+			},
+		},
+	]);
+
+	return revenue.length && revenue[0].total;
+};
+
+export default { saveOrderInDB, calculateOrderRevenue };

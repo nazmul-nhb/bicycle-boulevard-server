@@ -91,6 +91,13 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { id } = req.params;
         const update = product_validation_1.zodProduct.updateSchema.parse(req.body);
+        // If client wants to update quantity, handle it properly
+        if (update.quantity && update.quantity > 0) {
+            update.inStock = true;
+        }
+        if (update.quantity && update.quantity <= 0) {
+            update.inStock = false;
+        }
         const product = yield product_services_1.default.updateProductInDB(id, update);
         if (product) {
             return res.status(200).json({

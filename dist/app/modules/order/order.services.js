@@ -12,12 +12,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const order_model_1 = require("./order.model");
 /**
  *
- * @param productData Accepts product data sent from client
- * @returns Saved product from MongoDB
+ * @param orderData Accepts order data sent from client
+ * @returns Saved order from MongoDB
  */
 const saveOrderInDB = (orderData) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = new order_model_1.Order(orderData);
-    const result = yield product.save();
+    const order = new order_model_1.Order(orderData);
+    const result = yield order.save();
     return result;
 });
-exports.default = { saveOrderInDB };
+const calculateOrderRevenue = () => __awaiter(void 0, void 0, void 0, function* () {
+    const revenue = yield order_model_1.Order.aggregate([
+        {
+            $lookup: {
+                from: 'products',
+                localField: 'product',
+                foreignField: '_id',
+                as: 'bicycle',
+            },
+        },
+        { $unwind: '$bicycle' },
+        {
+            $group: {
+                _id: null,
+                total: {
+                    $sum: { $multiply: ['$bicycle.price', '$quantity'] },
+                },
+            },
+        },
+    ]);
+    return revenue.length && revenue[0].total;
+});
+exports.default = { saveOrderInDB, calculateOrderRevenue };

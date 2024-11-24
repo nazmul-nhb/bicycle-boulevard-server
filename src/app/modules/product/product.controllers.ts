@@ -125,6 +125,14 @@ const updateProduct = async (
 
 		const update = zodProduct.updateSchema.parse(req.body);
 
+		// If client wants to update quantity, handle it properly
+		if (update.quantity && update.quantity > 0) {
+			update.inStock = true;
+		}
+		if (update.quantity && update.quantity <= 0) {
+			update.inStock = false;
+		}
+
 		const product = await productServices.updateProductInDB(id, update);
 
 		if (product) {
