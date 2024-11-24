@@ -1,6 +1,14 @@
 # Bicycle Boulevard Server 🚲
 
-A comprehensive backend API built with **Express** and **TypeScript**, designed for managing a bicycle store with `MongoDB` and `Mongoose`. This project supports CRUD operations for bicycles and orders, features advanced error handling, and ensures data integrity through schema validation. For Input validation `Zod` is used. Created a class `UnifiedError` with multiple private methods to process different types of errors.
+- [Live Server](https://bicycle-boulevard-server-nhb.vercel.app)
+
+A robust backend API built with **Express** and **TypeScript**, designed for managing bicycle inventory and orders with **MongoDB** and **Mongoose**. The server supports CRUD operations, advanced error handling, and comprehensive input validation powered by `Zod`.
+
+## Key Highlights
+
+- **Bicycle and Order Management:** Simplified endpoints for adding, updating, and searching bicycles, with order processing and revenue tracking.
+- **Unified Error Handling:** Centralized handling for schema validation, database operations, and other potential failures using `UnifiedError` class.
+- **Custom Error Instance:** Used a class `ErrorWithStatus` to create custom instance of `Error`.
 
 ---
 
@@ -24,7 +32,7 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 
 ### ⚙️ Error Handling
 
-- Unified error responses for `validation` (mostly `zod` and `MongoDB`), `duplication`, `casting` (MongoDB `ObjectId`), and `parsing`, `insufficient`, `not found` and almost every possible types of errors.
+- Unified error responses for `validation` (mostly `zod` and `MongoDB`), `duplication`, `casting` (MongoDB `ObjectId`), `parsing`, `insufficient`, `not found` and almost every possible types of errors.
 - Clear and structured error messages to facilitate debugging.
 
 ---
@@ -148,6 +156,7 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 2. **Get All Bicycles**
    - **GET** `/api/products`
    - Query parameters: `searchTerm`
+   - Query example: `/api/products?searchTerm=partialValueOfField` (`searchTerm` can be any partial value of `name`, `brand`, `type`)
    - Response:
 
     ```json
