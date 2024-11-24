@@ -10,6 +10,8 @@ export type TProductDocument = TProduct & Document;
 
 export type TProductNotDeleted = Omit<TProductDocument, 'isDeleted'>;
 
+export type TSearchQuery = { searchTerm?: string };
+
 export type RCreateProduct = {
 	success: boolean;
 	message: string;

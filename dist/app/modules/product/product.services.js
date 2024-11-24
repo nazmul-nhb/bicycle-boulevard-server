@@ -36,8 +36,16 @@ const saveProductToDB = (productData) => __awaiter(void 0, void 0, void 0, funct
  *
  * @returns Returns all product data from the DB
  */
-const getAllProductsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield product_model_1.Product.find({});
+const getAllProductsFromDB = (searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
+    const filter = {};
+    if (searchTerm) {
+        filter.$or = [
+            { name: { $regex: searchTerm, $options: 'i' } },
+            { brand: { $regex: searchTerm, $options: 'i' } },
+            { type: { $regex: searchTerm, $options: 'i' } },
+        ];
+    }
+    const result = yield product_model_1.Product.find(filter);
     return result;
 });
 /**

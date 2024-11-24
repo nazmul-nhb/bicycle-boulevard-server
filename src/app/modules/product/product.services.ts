@@ -1,4 +1,4 @@
-import type { ObjectId } from 'mongoose';
+import type { FilterQuery, ObjectId } from 'mongoose';
 import type {
 	TProduct,
 	TProductDocument,
@@ -27,8 +27,20 @@ const saveProductToDB = async (
  *
  * @returns Returns all product data from the DB
  */
-const getAllProductsFromDB = async (): Promise<TProductDocument[]> => {
-	const result = await Product.find({});
+const getAllProductsFromDB = async (
+	searchTerm?: string,
+): Promise<TProductDocument[]> => {
+	const filter: FilterQuery<TProductDocument> = {};
+
+	if (searchTerm) {
+		filter.$or = [
+			{ name: { $regex: searchTerm, $options: 'i' } },
+			{ brand: { $regex: searchTerm, $options: 'i' } },
+			{ type: { $regex: searchTerm, $options: 'i' } },
+		];
+	}
+
+	const result = await Product.find(filter);
 	return result;
 };
 

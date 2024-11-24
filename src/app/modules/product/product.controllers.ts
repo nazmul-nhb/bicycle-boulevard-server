@@ -1,10 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import type {
 	RAllProducts,
 	RCreateProduct,
 	TProduct,
 	RSingleProduct,
 	TUpdateProduct,
+	TSearchQuery,
 } from './product.types';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
@@ -41,14 +42,29 @@ const createProduct = async (
  *
  * @returns Returns all student data from the DB
  */
-const getAllProducts = async (
-	_req: Request,
-	res: Response<RAllProducts>,
-	next: NextFunction,
-): Promise<Response<RAllProducts> | void> => {
+const getAllProducts: RequestHandler<
+	{},
+	RAllProducts,
+	{},
+	TSearchQuery
+> = async (req, res, next) => {
 	try {
-		const products = await productServices.getAllProductsFromDB();
+		const { searchTerm } = req.query;
 
+		const products = await productServices.getAllProductsFromDB(searchTerm);
+
+		if (searchTerm && !products.length) {
+			const notFoundError = new ErrorWithStatus(
+				'QueryNotMatchedError',
+				`No bicycle matched with search term: ${searchTerm}!`,
+				404,
+				'not_matched',
+				searchTerm,
+				'search_products',
+			);
+			next(notFoundError);
+			return;
+		}
 		return res.status(200).json({
 			status: true,
 			message: `Bicycles retrieved successfully!`,

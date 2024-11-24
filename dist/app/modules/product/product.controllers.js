@@ -40,9 +40,15 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
  *
  * @returns Returns all student data from the DB
  */
-const getAllProducts = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const products = yield product_services_1.default.getAllProductsFromDB();
+        const { searchTerm } = req.query;
+        const products = yield product_services_1.default.getAllProductsFromDB(searchTerm);
+        if (searchTerm && !products.length) {
+            const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('QueryNotMatchedError', `No bicycle matched with search term: ${searchTerm}!`, 404, 'not_matched', searchTerm, 'search_products');
+            next(notFoundError);
+            return;
+        }
         return res.status(200).json({
             status: true,
             message: `Bicycles retrieved successfully!`,

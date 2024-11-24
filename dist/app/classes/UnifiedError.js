@@ -196,39 +196,36 @@ class UnifiedError {
      */
     _processGenericError(error) {
         if (this._isErrorWithStatus(error)) {
-            // Specific handling for 404 Not Found errors
-            if (error.status === 404) {
-                return {
-                    message: 'Resource Not Found!',
-                    success: false,
-                    error: {
-                        name: error.name || 'NotFoundError',
-                        errors: {
-                            [error.type]: {
+            return {
+                message: error.name,
+                success: false,
+                error: {
+                    name: error.name,
+                    errors: {
+                        [error.type]: {
+                            message: error.message,
+                            name: error.name,
+                            properties: {
                                 message: error.message,
-                                name: error.name || 'NotFoundError',
-                                properties: {
-                                    message: error.message,
-                                    type: error.type,
-                                },
-                                kind: error.type,
-                                path: error.path,
-                                value: error.value,
+                                type: error.type,
                             },
+                            kind: error.type,
+                            path: error.path,
+                            value: error.value,
                         },
                     },
-                    stack: this._generateStackTrace(error.stack),
-                };
-            }
+                },
+                stack: this._generateStackTrace(error.stack),
+            };
         }
-        // Generic error fallback
+        // Generic fallback error
         return {
             message: error.message || 'An error occurred',
             success: false,
             error: {
                 name: error.name || 'Error',
                 errors: {
-                    unknown: {
+                    [error.name || 'unknown']: {
                         message: error.message || 'An error occurred',
                         name: 'Error',
                         properties: {
