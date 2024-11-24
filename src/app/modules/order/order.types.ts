@@ -1,15 +1,15 @@
-import type { Document, Types } from 'mongoose';
+import type { Document, ObjectId } from 'mongoose';
 
 export type TOrder = {
 	email: string;
-	product: Types.ObjectId;
+	product: ObjectId | string;
 	quantity: number;
 	totalPrice?: number;
 };
 
 export type TOrderDocument = TOrder & Document;
 
-export type RCreateProduct = {
+export type RCreateOrder = {
 	message: string;
 	status: boolean;
 	data: TOrderDocument;

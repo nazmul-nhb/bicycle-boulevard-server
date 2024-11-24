@@ -12,7 +12,7 @@ import { Product } from './product.model';
  * @param productData Accepts product data sent from client
  * @returns Saved product from MongoDB
  */
-const saveProductToDB = async (
+const saveProductInDB = async (
 	productData: TProduct,
 ): Promise<TProductNotDeleted> => {
 	const product = new Product(productData);
@@ -62,7 +62,7 @@ const getSingleProductFromDB = async (
  * @returns Returns updated product data from MongoDB if updates any
  */
 const updateProductInDB = async (
-	id: ObjectId,
+	id: ObjectId | string,
 	update: TUpdateProduct,
 ): Promise<TProductDocument | null> => {
 	const updateArgs = [{ _id: id }, update, { new: true, rawResult: true }];
@@ -91,7 +91,7 @@ const deleteProductFromDB = async (
 };
 
 export default {
-	saveProductToDB,
+	saveProductInDB,
 	getAllProductsFromDB,
 	getSingleProductFromDB,
 	updateProductInDB,

@@ -26,7 +26,7 @@ const product_model_1 = require("./product.model");
  * @param productData Accepts product data sent from client
  * @returns Saved product from MongoDB
  */
-const saveProductToDB = (productData) => __awaiter(void 0, void 0, void 0, function* () {
+const saveProductInDB = (productData) => __awaiter(void 0, void 0, void 0, function* () {
     const product = new product_model_1.Product(productData);
     const result = yield product.save();
     const _a = result.toObject(), { isDeleted: _skip } = _a, resultWithoutIsDeleted = __rest(_a, ["isDeleted"]);
@@ -78,7 +78,7 @@ const deleteProductFromDB = (id) => __awaiter(void 0, void 0, void 0, function* 
     return result;
 });
 exports.default = {
-    saveProductToDB,
+    saveProductInDB,
     getAllProductsFromDB,
     getSingleProductFromDB,
     updateProductInDB,

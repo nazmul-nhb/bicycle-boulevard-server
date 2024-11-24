@@ -23,11 +23,11 @@ const ErrorWithStatus_1 = require("../../classes/ErrorWithStatus");
 const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const productData = product_validation_1.zodProduct.creationSchema.parse(req.body);
-        const product = yield product_services_1.default.saveProductToDB(productData);
+        const product = yield product_services_1.default.saveProductInDB(productData);
         if (product) {
             return res.status(201).json({
-                success: true,
                 message: `Bicycle created successfully!`,
+                success: true,
                 data: product,
             });
         }
@@ -50,8 +50,8 @@ const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             return;
         }
         return res.status(200).json({
-            status: true,
             message: `Bicycles retrieved successfully!`,
+            status: true,
             data: products,
         });
     }
@@ -69,8 +69,8 @@ const getSingleProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         const product = yield product_services_1.default.getSingleProductFromDB(id);
         if (product) {
             return res.status(200).json({
-                status: true,
                 message: `Bicycle retrieved successfully!`,
+                status: true,
                 data: product,
             });
         }
@@ -94,8 +94,8 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         const product = yield product_services_1.default.updateProductInDB(id, update);
         if (product) {
             return res.status(200).json({
-                status: true,
                 message: `Bicycle updated successfully!`,
+                status: true,
                 data: product,
             });
         }
@@ -117,8 +117,8 @@ const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         const deleted = yield product_services_1.default.deleteProductFromDB(id);
         if (deleted) {
             return res.status(200).json({
-                status: true,
                 message: `Bicycle deleted successfully!`,
+                status: true,
                 data: {},
             });
         }

@@ -41,6 +41,4 @@ const processErrorMsgs = (error) => {
         return error.message;
     }
 };
-exports.default = {
-    processErrorMsgs,
-};
+exports.default = { processErrorMsgs };

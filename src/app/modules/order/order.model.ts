@@ -1,6 +1,9 @@
 import { model, Schema } from 'mongoose';
 import type { TOrderDocument } from './order.types';
 import { Product } from '../product/product.model';
+import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import productServices from '../product/product.services';
+import type { TUpdateProduct } from '../product/product.types';
 
 const orderSchema = new Schema<TOrderDocument>(
 	{
@@ -26,21 +29,52 @@ const orderSchema = new Schema<TOrderDocument>(
 		},
 	},
 	{
-		timestamps: true, // Automatically adds `createdAt` and `updatedAt`
+		timestamps: true,
 		versionKey: false,
 	},
 );
 
 // Calculate totalPrice if there is no hardcoded price in the request body
 orderSchema.pre('save', async function (next) {
-	if (!this.totalPrice) {
-        const product = await Product.findById(this.product);
-        
-		if (product) {
+	const product = await Product.findById(this.product);
+
+	if (product) {
+		if (!this.totalPrice) {
 			this.totalPrice = product.price * this.quantity;
-		} else {
-			return next(new Error('Product Not Found!'));
 		}
+
+		const remainingQuantity = product.quantity - this.quantity;
+
+		const productUpdate: TUpdateProduct = { quantity: remainingQuantity };
+
+		if (remainingQuantity < 0) {
+			const notEnoughQuantity = new ErrorWithStatus(
+				'NotEnoughQuantity',
+				`In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`,
+				507,
+				'insufficient_quantity',
+				this.product.toString(),
+				'create_order',
+			);
+			next(notEnoughQuantity);
+			return;
+		}
+
+		if (remainingQuantity <= 0) {
+			productUpdate.inStock = false;
+		}
+
+		await productServices.updateProductInDB(this.product, productUpdate);
+	} else {
+		const notFoundError = new ErrorWithStatus(
+			'NotFoundError',
+			`No bicycle found with id: ${this.product} to create an order!`,
+			404,
+			'not_found',
+			this.product.toString(),
+			'create_order',
+		);
+		next(notFoundError);
 	}
 	next();
 });

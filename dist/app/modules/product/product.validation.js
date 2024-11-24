@@ -35,7 +35,4 @@ const updateSchema = creationSchema
     .partial()
     .omit({ isDeleted: true })
     .strict();
-exports.zodProduct = {
-    creationSchema,
-    updateSchema,
-};
+exports.zodProduct = { creationSchema, updateSchema };

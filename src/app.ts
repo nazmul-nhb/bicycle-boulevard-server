@@ -5,6 +5,7 @@ import type { Application, NextFunction, Request, Response } from 'express';
 import { productRoutes } from './app/modules/product/product.routes';
 import { UnifiedError } from './app/classes/UnifiedError';
 import { ErrorWithStatus } from './app/classes/ErrorWithStatus';
+import { orderRoutes } from './app/modules/order/order.routes';
 
 const app: Application = express();
 
@@ -21,6 +22,7 @@ app.get('/', (_req: Request, res: Response) => {
 
 // Application Routes
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Error handler for 404
 app.use((req: Request, _res: Response, next: NextFunction) => {

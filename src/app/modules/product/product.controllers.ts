@@ -24,7 +24,7 @@ const createProduct = async (
 	try {
 		const productData = zodProduct.creationSchema.parse(req.body);
 
-		const product = await productServices.saveProductToDB(productData);
+		const product = await productServices.saveProductInDB(productData);
 
 		if (product) {
 			return res.status(201).json({

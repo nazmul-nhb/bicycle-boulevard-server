@@ -9,6 +9,7 @@ const utilities_1 = __importDefault(require("./app/utilities"));
 const product_routes_1 = require("./app/modules/product/product.routes");
 const UnifiedError_1 = require("./app/classes/UnifiedError");
 const ErrorWithStatus_1 = require("./app/classes/ErrorWithStatus");
+const order_routes_1 = require("./app/modules/order/order.routes");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -21,6 +22,7 @@ app.get('/', (_req, res) => {
 });
 // Application Routes
 app.use('/api/products', product_routes_1.productRoutes);
+app.use('/api/orders', order_routes_1.orderRoutes);
 // Error handler for 404
 app.use((req, _res, next) => {
     const error = new ErrorWithStatus_1.ErrorWithStatus('NotFoundError', `Requested End-Point “${req.method}: ${req.url}” Not Found!`, 404, 'not_found', req.url, `${req.method}: ${req.url}`);
