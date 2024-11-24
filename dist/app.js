@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const zod_1 = require("zod");
 const utilities_1 = __importDefault(require("./app/utilities"));
 const product_routes_1 = require("./app/modules/product/product.routes");
+const order_routes_1 = require("./app/modules/order/order.routes");
 const UnifiedError_1 = require("./app/classes/UnifiedError");
 const ErrorWithStatus_1 = require("./app/classes/ErrorWithStatus");
-const order_routes_1 = require("./app/modules/order/order.routes");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -38,6 +39,12 @@ app.use((error, req, res, next) => {
     if (res.headersSent) {
         return next(error);
     }
-    res.status((error === null || error === void 0 ? void 0 : error.status) || 500).json(unifiedError.parseErrors());
+    // Parse appropriate status code
+    const statusCode = error instanceof zod_1.ZodError
+        ? 400
+        : error instanceof ErrorWithStatus_1.ErrorWithStatus
+            ? error.status
+            : 500;
+    res.status(statusCode).json(unifiedError.parseErrors());
 });
 exports.default = app;

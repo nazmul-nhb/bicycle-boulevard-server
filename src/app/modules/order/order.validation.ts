@@ -4,10 +4,12 @@ import { isValidObjectId } from 'mongoose';
 const creationSchema = z.object({
 	email: z
 		.string({ message: 'Customer email is required!' })
+		.trim()
 		.email({ message: 'Must be a valid email address!' }),
 
 	product: z
 		.string({ message: 'Product ID is required!' })
+		.trim()
 		.refine((id) => isValidObjectId(id), {
 			message: 'Invalid Product ID! Must be a valid MongoDB ObjectId!',
 		}),

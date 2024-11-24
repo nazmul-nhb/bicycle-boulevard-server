@@ -6,9 +6,11 @@ const mongoose_1 = require("mongoose");
 const creationSchema = zod_1.z.object({
     email: zod_1.z
         .string({ message: 'Customer email is required!' })
+        .trim()
         .email({ message: 'Must be a valid email address!' }),
     product: zod_1.z
         .string({ message: 'Product ID is required!' })
+        .trim()
         .refine((id) => (0, mongoose_1.isValidObjectId)(id), {
         message: 'Invalid Product ID! Must be a valid MongoDB ObjectId!',
     }),

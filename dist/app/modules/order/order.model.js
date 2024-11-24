@@ -17,6 +17,7 @@ const mongoose_1 = require("mongoose");
 const product_model_1 = require("../product/product.model");
 const ErrorWithStatus_1 = require("../../classes/ErrorWithStatus");
 const product_services_1 = __importDefault(require("../product/product.services"));
+const product_validation_1 = require("../product/product.validation");
 const orderSchema = new mongoose_1.Schema({
     email: {
         type: String,
@@ -53,14 +54,15 @@ orderSchema.pre('save', function (next) {
             const remainingQuantity = product.quantity - this.quantity;
             const productUpdate = { quantity: remainingQuantity };
             if (remainingQuantity < 0) {
-                const notEnoughQuantity = new ErrorWithStatus_1.ErrorWithStatus('NotEnoughQuantity', `In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`, 507, 'insufficient_quantity', this.product.toString(), 'create_order');
-                next(notEnoughQuantity);
+                const insufficientStock = new ErrorWithStatus_1.ErrorWithStatus(' InsufficientStock', `In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`, 507, 'insufficient_stock', this.product.toString(), 'create_order');
+                next(insufficientStock);
                 return;
             }
             if (remainingQuantity <= 0) {
                 productUpdate.inStock = false;
             }
-            yield product_services_1.default.updateProductInDB(this.product, productUpdate);
+            const sanitizedData = product_validation_1.zodProduct.updateSchema.parse(productUpdate);
+            yield product_services_1.default.updateProductInDB(this.product, sanitizedData);
         }
         else {
             const notFoundError = new ErrorWithStatus_1.ErrorWithStatus('NotFoundError', `No bicycle found with id: ${this.product} to create an order!`, 404, 'not_found', this.product.toString(), 'create_order');

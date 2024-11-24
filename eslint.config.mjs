@@ -39,9 +39,8 @@ export default [
       'prefer-const': 'error',
       "no-console": ["warn", { "allow": ["warn", "error"] }],
       'no-undef': 'error',
-      // semi: ["warn", "always"],
-      // '@typescript-eslint/no-unused-expressions': 'error',
       "@typescript-eslint/no-empty-object-type": "off",
+      '@typescript-eslint/no-unused-expressions': 'error',
       "@typescript-eslint/consistent-type-imports": ["warn", { "prefer": "type-imports" }],
       "@typescript-eslint/no-unused-vars": ["error", { 'varsIgnorePattern': '^_' }]
     },

@@ -7,8 +7,8 @@ const ErrorWithStatus_1 = require("./ErrorWithStatus");
 /**
  * Create an instance of UnifiedError and methods to receive error response
  *
- * @param error Error as unknown type
- * @param input The input fields as object from `req.body` if there is any
+ * @param error Error as `unknown` type
+ * @param input Optional input fields as object from `req.body`, default is null
  */
 class UnifiedError {
     constructor(error, input = null) {

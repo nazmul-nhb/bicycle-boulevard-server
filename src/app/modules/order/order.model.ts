@@ -4,6 +4,7 @@ import { Product } from '../product/product.model';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import productServices from '../product/product.services';
 import type { TUpdateProduct } from '../product/product.types';
+import { zodProduct } from '../product/product.validation';
 
 const orderSchema = new Schema<TOrderDocument>(
 	{
@@ -48,23 +49,25 @@ orderSchema.pre('save', async function (next) {
 		const productUpdate: TUpdateProduct = { quantity: remainingQuantity };
 
 		if (remainingQuantity < 0) {
-			const notEnoughQuantity = new ErrorWithStatus(
-				'NotEnoughQuantity',
+			const insufficientStock = new ErrorWithStatus(
+				' InsufficientStock',
 				`In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`,
 				507,
-				'insufficient_quantity',
+				'insufficient_stock',
 				this.product.toString(),
 				'create_order',
 			);
-			next(notEnoughQuantity);
+			next(insufficientStock);
 			return;
 		}
 
 		if (remainingQuantity <= 0) {
 			productUpdate.inStock = false;
-		}
+        }
+        
+        const sanitizedData = zodProduct.updateSchema.parse(productUpdate);
 
-		await productServices.updateProductInDB(this.product, productUpdate);
+		await productServices.updateProductInDB(this.product, sanitizedData);
 	} else {
 		const notFoundError = new ErrorWithStatus(
 			'NotFoundError',

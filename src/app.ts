@@ -1,11 +1,12 @@
 import cors from 'cors';
 import express from 'express';
+import { ZodError } from 'zod';
 import utilities from './app/utilities';
 import type { Application, NextFunction, Request, Response } from 'express';
 import { productRoutes } from './app/modules/product/product.routes';
+import { orderRoutes } from './app/modules/order/order.routes';
 import { UnifiedError } from './app/classes/UnifiedError';
 import { ErrorWithStatus } from './app/classes/ErrorWithStatus';
-import { orderRoutes } from './app/modules/order/order.routes';
 
 const app: Application = express();
 
@@ -50,9 +51,15 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 		return next(error);
 	}
 
-	res.status((error as ErrorWithStatus)?.status || 500).json(
-		unifiedError.parseErrors(),
-	);
+	// Parse appropriate status code
+	const statusCode: number =
+		error instanceof ZodError
+			? 400
+			: error instanceof ErrorWithStatus
+				? error.status
+				: 500;
+
+	res.status(statusCode).json(unifiedError.parseErrors());
 });
 
 export default app;
