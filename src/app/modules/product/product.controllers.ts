@@ -28,8 +28,8 @@ const createProduct = async (
 
 		if (product) {
 			return res.status(201).json({
-				success: true,
 				message: `Bicycle created successfully!`,
+				success: true,
 				data: product,
 			});
 		}
@@ -66,8 +66,8 @@ const getAllProducts: RequestHandler<
 			return;
 		}
 		return res.status(200).json({
-			status: true,
 			message: `Bicycles retrieved successfully!`,
+			status: true,
 			data: products,
 		});
 	} catch (error) {
@@ -91,8 +91,8 @@ const getSingleProduct = async (
 
 		if (product) {
 			return res.status(200).json({
-				status: true,
 				message: `Bicycle retrieved successfully!`,
+				status: true,
 				data: product,
 			});
 		} else {
@@ -129,8 +129,8 @@ const updateProduct = async (
 
 		if (product) {
 			return res.status(200).json({
-				status: true,
 				message: `Bicycle updated successfully!`,
+				status: true,
 				data: product,
 			});
 		} else {
@@ -164,8 +164,8 @@ const deleteProduct = async (
 
 		if (deleted) {
 			return res.status(200).json({
-				status: true,
 				message: `Bicycle deleted successfully!`,
+				status: true,
 				data: {},
 			});
 		} else {

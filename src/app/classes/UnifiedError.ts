@@ -230,7 +230,7 @@ export class UnifiedError {
 	private _processGenericError(error: Error): UnifiedErrorResponse {
 		if (this._isErrorWithStatus(error)) {
 			return {
-				message: error.name,
+				message: error.message,
 				success: false,
 				error: {
 					name: error.name,

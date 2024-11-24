@@ -41,6 +41,4 @@ const processErrorMsgs = (error: unknown): string => {
 	}
 };
 
-export default {
-	processErrorMsgs,
-};
+export default { processErrorMsgs };
