@@ -52,7 +52,7 @@ orderSchema.pre('save', async function (next) {
 			const insufficientStock = new ErrorWithStatus(
 				' InsufficientStock',
 				`In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`,
-				507,
+				409,
 				'insufficient_stock',
 				this.product.toString(),
 				'create_order',
@@ -63,9 +63,9 @@ orderSchema.pre('save', async function (next) {
 
 		if (remainingQuantity <= 0) {
 			productUpdate.inStock = false;
-        }
-        
-        const sanitizedData = zodProduct.updateSchema.parse(productUpdate);
+		}
+
+		const sanitizedData = zodProduct.updateSchema.parse(productUpdate);
 
 		await productServices.updateProductInDB(this.product, sanitizedData);
 	} else {

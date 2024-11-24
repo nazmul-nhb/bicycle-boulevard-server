@@ -32,6 +32,16 @@ const createProduct = async (
 				success: true,
 				data: product,
 			});
+		} else {
+			const serverError = new ErrorWithStatus(
+				'ProductCreationError',
+				`Failed to create the bicycle!`,
+				500,
+				'creation_failed',
+				productData.name,
+				'create_product',
+			);
+			next(serverError);
 		}
 	} catch (error) {
 		next(error);
@@ -40,7 +50,7 @@ const createProduct = async (
 
 /**
  *
- * @returns Returns all student data from the DB
+ * Get all student data from the DB
  */
 const getAllProducts: RequestHandler<
 	{},

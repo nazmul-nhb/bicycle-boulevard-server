@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { RCreateOrder, ROrderRevenue, TOrder } from './order.types';
 import { zodOrder } from './order.validation';
 import orderServices from './order.services';
+import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 
 /**
  *
@@ -23,6 +24,16 @@ const createOrder = async (
 				status: true,
 				data: order,
 			});
+		} else {
+			const serverError = new ErrorWithStatus(
+				'ProductCreationError',
+				`Failed to create the bicycle!`,
+				500,
+				'creation_failed',
+				orderData.product,
+				'create_product',
+			);
+			next(serverError);
 		}
 	} catch (error) {
 		next(error);

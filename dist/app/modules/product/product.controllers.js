@@ -31,6 +31,10 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 data: product,
             });
         }
+        else {
+            const serverError = new ErrorWithStatus_1.ErrorWithStatus('ProductCreationError', `Failed to create the bicycle!`, 500, 'creation_failed', productData.name, 'create_product');
+            next(serverError);
+        }
     }
     catch (error) {
         next(error);
@@ -38,7 +42,7 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 });
 /**
  *
- * @returns Returns all student data from the DB
+ * Get all student data from the DB
  */
 const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

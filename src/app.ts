@@ -7,6 +7,7 @@ import { productRoutes } from './app/modules/product/product.routes';
 import { orderRoutes } from './app/modules/order/order.routes';
 import { UnifiedError } from './app/classes/UnifiedError';
 import { ErrorWithStatus } from './app/classes/ErrorWithStatus';
+import { MongooseError } from 'mongoose';
 
 const app: Application = express();
 
@@ -57,7 +58,14 @@ app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
 			? 400
 			: error instanceof ErrorWithStatus
 				? error.status
-				: 500;
+				: error instanceof MongooseError
+					? error.name === 'ValidationError' ||
+						error.name === 'CastError'
+						? 400
+						: error.name === 'DocumentNotFoundError'
+							? 404
+							: 500
+					: 500;
 
 	res.status(statusCode).json(unifiedError.parseErrors());
 });

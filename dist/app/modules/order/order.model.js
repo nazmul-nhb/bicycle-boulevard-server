@@ -54,7 +54,7 @@ orderSchema.pre('save', function (next) {
             const remainingQuantity = product.quantity - this.quantity;
             const productUpdate = { quantity: remainingQuantity };
             if (remainingQuantity < 0) {
-                const insufficientStock = new ErrorWithStatus_1.ErrorWithStatus(' InsufficientStock', `In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`, 507, 'insufficient_stock', this.product.toString(), 'create_order');
+                const insufficientStock = new ErrorWithStatus_1.ErrorWithStatus(' InsufficientStock', `In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`, 409, 'insufficient_stock', this.product.toString(), 'create_order');
                 next(insufficientStock);
                 return;
             }

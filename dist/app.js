@@ -11,6 +11,7 @@ const product_routes_1 = require("./app/modules/product/product.routes");
 const order_routes_1 = require("./app/modules/order/order.routes");
 const UnifiedError_1 = require("./app/classes/UnifiedError");
 const ErrorWithStatus_1 = require("./app/classes/ErrorWithStatus");
+const mongoose_1 = require("mongoose");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -44,7 +45,14 @@ app.use((error, req, res, next) => {
         ? 400
         : error instanceof ErrorWithStatus_1.ErrorWithStatus
             ? error.status
-            : 500;
+            : error instanceof mongoose_1.MongooseError
+                ? error.name === 'ValidationError' ||
+                    error.name === 'CastError'
+                    ? 400
+                    : error.name === 'DocumentNotFoundError'
+                        ? 404
+                        : 500
+                : 500;
     res.status(statusCode).json(unifiedError.parseErrors());
 });
 exports.default = app;

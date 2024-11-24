@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const order_validation_1 = require("./order.validation");
 const order_services_1 = __importDefault(require("./order.services"));
+const ErrorWithStatus_1 = require("../../classes/ErrorWithStatus");
 /**
  *
  * Create a new order
@@ -28,6 +29,10 @@ const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 status: true,
                 data: order,
             });
+        }
+        else {
+            const serverError = new ErrorWithStatus_1.ErrorWithStatus('ProductCreationError', `Failed to create the bicycle!`, 500, 'creation_failed', orderData.product, 'create_product');
+            next(serverError);
         }
     }
     catch (error) {
