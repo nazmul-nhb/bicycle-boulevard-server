@@ -324,7 +324,7 @@ All error responses follow this structured format:
     "name": "ErrorName",
     "errors": { ... }
   },
-  "stack": "Stack trace for the Error"
+  "stack": "Error: Something went wrong\n    at..."
 }
 ```
 
