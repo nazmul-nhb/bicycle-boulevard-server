@@ -7,7 +7,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
 ## Key Highlights
 
 - **Bicycle and Order Management:** Simplified endpoints for adding, updating, and searching bicycles, with order processing and revenue tracking.
-- **Unified Error Handling:** Centralized handling for schema validation, database operations, and other potential failures using `UnifiedError` class.
+- **Unified Error Handling:** Centralized handling for `schema validation`, `database operations`, and other potential failures using `UnifiedError` class.
 - **Custom Error Instance:** Used a class `ErrorWithStatus` to create custom instance of `Error`.
 
 ---
@@ -296,7 +296,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
     "message": "Order created successfully!",
     "status": true,
     "data": {
-            "email": "<abul@ab.vv>",
+            "email": "customer@example.com",
             "product": "6742c11a49c1956daec11abd",
             "quantity": 2,
             "_id": "6743355c1fb2a11d437591a4",
