@@ -255,7 +255,18 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
     {
         "message": "Bicycle deleted successfully!",
         "status": true,
-        "data": {}
+        "data": {
+            "name": "Roadster 5000",
+            "brand": "SpeedX",
+            "price": 700,
+            "type": "Mountain",
+            "description": "A premium road bike designed for speed and performance.",
+            "quantity": 12,
+            "inStock": true,
+            "_id": "674339111fb2a11d437591ab",
+            "createdAt": "2024-11-24T14:32:49.261Z",
+            "updatedAt": "2024-11-24T14:58:31.261Z"
+        }
     }
     ```
 
