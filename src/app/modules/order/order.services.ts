@@ -14,6 +14,10 @@ const saveOrderInDB = async (orderData: TOrder): Promise<TOrderDocument> => {
 	return result;
 };
 
+/**
+ * 
+ * Calculate total revenue for all the orders
+ */
 const calculateOrderRevenue = async (): Promise<number> => {
 	const revenue: TCalculatedRevenue[] = await Order.aggregate([
 		{

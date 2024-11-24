@@ -20,6 +20,10 @@ const saveOrderInDB = (orderData) => __awaiter(void 0, void 0, void 0, function*
     const result = yield order.save();
     return result;
 });
+/**
+ *
+ * Calculate total revenue for all the orders
+ */
 const calculateOrderRevenue = () => __awaiter(void 0, void 0, void 0, function* () {
     const revenue = yield order_model_1.Order.aggregate([
         {

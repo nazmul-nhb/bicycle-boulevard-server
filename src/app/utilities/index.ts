@@ -3,6 +3,7 @@ import type { IMongoDuplicateError, IParserError } from '../types/interfaces';
 import type { CastError } from 'mongoose';
 import { MongooseError } from 'mongoose';
 import { ErrorWithStatus } from '../classes/ErrorWithStatus';
+
 /**
  *
  * @param error Accepts an error of `unknown` type
