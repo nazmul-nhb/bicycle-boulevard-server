@@ -2,9 +2,10 @@ import { ZodError } from 'zod';
 import type { IMongoDuplicateError, IParserError } from '../types/interfaces';
 import type { CastError } from 'mongoose';
 import { MongooseError } from 'mongoose';
+import { ErrorWithStatus } from '../classes/ErrorWithStatus';
 /**
  *
- * @param error Accepts an error of unknown type
+ * @param error Accepts an error of `unknown` type
  * @returns Returns error message as string
  */
 const processErrorMsgs = (error: unknown): string => {
@@ -41,4 +42,23 @@ const processErrorMsgs = (error: unknown): string => {
 	}
 };
 
-export default { processErrorMsgs };
+/**
+ *
+ * @param error Accepts an error of `unknown` type
+ * @returns Status code from the error object
+ */
+const parseStatusCode = (error: unknown): number => {
+	return error instanceof ZodError
+		? 400
+		: error instanceof ErrorWithStatus
+			? error.status
+			: error instanceof MongooseError
+				? error.name === 'ValidationError' || error.name === 'CastError'
+					? 400
+					: error.name === 'DocumentNotFoundError'
+						? 404
+						: 500
+				: 500;
+};
+
+export default { processErrorMsgs, parseStatusCode };

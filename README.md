@@ -1,6 +1,6 @@
 # Bicycle Boulevard Server 🚲
 
-A comprehensive backend API built with **Express** and **TypeScript**, designed for managing a bicycle store with MongoDB and Mongoose. This project supports CRUD operations for bicycles and orders, features advanced error handling, and ensures data integrity through schema validation. For Input validation `Zod` is used. Created a class `UnifiedError` with multiple private methods to process different types of errors.
+A comprehensive backend API built with **Express** and **TypeScript**, designed for managing a bicycle store with `MongoDB` and `Mongoose`. This project supports CRUD operations for bicycles and orders, features advanced error handling, and ensures data integrity through schema validation. For Input validation `Zod` is used. Created a class `UnifiedError` with multiple private methods to process different types of errors.
 
 ---
 
@@ -9,7 +9,7 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 ### 🚴 Bicycle Management
 
 - Create, read, update, and delete bicycles.
-- Search for bicycles by name, brand, or type.
+- Search for bicycles by `name`, `brand`, or `type`.
 - Supports categories such as Mountain, Road, Hybrid, BMX, and Electric.
 
 ### 📦 Order Management
@@ -33,8 +33,8 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 
 ### Prerequisites
 
-- Node.js (v18+)
-- pnpm package manager
+- Node.js (v20+)
+- `pnpm` package manager
 - if you prefer `npm` or `yarn`, delete `pnpm-lock.yaml` file and follow the following steps
 
 ### Installation
@@ -69,7 +69,7 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 
    ```env
    PORT=4242
-   MONGODB_URI=your_mongo_db_uri
+   MONGO_URI=your_mongo_db_uri
    ```
 
 4. Start the server:
@@ -126,12 +126,23 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
 
    - Response:
 
-     ```json
+    ```json
      {
-       "message": "Bicycle created successfully!",
-       "success": true,
-       "data": { ... }
-     }
+        "message": "Bicycle created successfully!",
+        "success": true,
+        "data": {
+            "name": "Roadster 5000",
+            "brand": "SpeedX",
+            "price": 300,
+            "type": "Road",
+            "description": "A premium road bike designed for speed and performance.",
+            "quantity": 20,
+            "inStock": true,
+            "_id": "674339111fb2a11d437591ab",
+            "createdAt": "2024-11-24T14:32:49.261Z",
+            "updatedAt": "2024-11-24T14:32:49.261Z"
+        }
+    }
      ```
 
 2. **Get All Bicycles**
@@ -139,23 +150,109 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
    - Query parameters: `searchTerm`
    - Response:
 
-     ```json
+    ```json
      {
        "message": "Bicycles retrieved successfully!",
        "status": true,
-       "data": [ ... ]
-     }
+       "data": [ 
+            {
+                "_id": "6742c11a49c1956daec11abd",
+                "name": "SpeedKing 500",
+                "brand": "Velocity",
+                "price": 1400,
+                "type": "Road",
+                "description": "Sleek road bike designed for speed enthusiasts.",
+                "quantity": 10,
+                "inStock": true,
+                "createdAt": "2024-11-24T06:00:58.848Z",
+                "updatedAt": "2024-11-24T14:17:00.495Z"
+            },
+            {
+                "_id": "6742c12549c1956daec11abf",
+                "name": "UrbanSprint",
+                "brand": "CityCyclers",
+                "price": 900,
+                "type": "Road",
+                "description": "Compact road bike perfect for urban commuting.",
+                "quantity": 20,
+                "inStock": true,
+                "createdAt": "2024-11-24T06:01:09.382Z",
+                "updatedAt": "2024-11-24T06:01:09.382Z"
+            },
+            {
+                "_id": "6742c12d49c1956daec11ac1",
+                "name": "Elite Strider",
+                "brand": "SwiftRiders",
+                "price": 1800,
+                "type": "Road",
+                "description": "Premium road bike for professional cyclists.",
+                "quantity": 4,
+                "inStock": true,
+                "createdAt": "2024-11-24T06:01:17.674Z",
+                "updatedAt": "2024-11-24T06:01:17.674Z"
+            }
+        ]
+    }
      ```
 
 3. **Get a Specific Bicycle**
    - **GET** `/api/products/:productId`
+   - Response:
+
+    ```json
+    {
+    "message": "Bicycle retrieved successfully!",
+    "status": true,
+    "data": {
+            "_id": "6742c11a49c1956daec11abd",
+            "name": "SpeedKing 500",
+            "brand": "Velocity",
+            "price": 1400,
+            "type": "Road",
+            "description": "Sleek road bike designed for speed enthusiasts.",
+            "quantity": 12,
+            "inStock": true,
+            "createdAt": "2024-11-24T06:00:58.848Z",
+            "updatedAt": "2024-11-24T06:00:58.848Z"
+        }
+    }
+    ```
 
 4. **Update a Bicycle**
    - **PUT** `/api/products/:productId`
-   - Request body contains fields to update.
+   - Request body contains fields to update:
+
+    ```json
+     {
+       "brand": "SpeedX",
+       "price": 700,
+       "type": "Mountain",
+       "quantity": 12,
+     }
+     ```
+
+   - Response:
+
+    ```json
+    {
+        "message": "Bicycle deleted successfully!",
+        "status": true,
+        "data": {}
+    }
+    ```
 
 5. **Delete a Bicycle**
    - **DELETE** `/api/products/:productId`
+
+   - Response:
+
+    ```json
+    {
+        "message": "Bicycle deleted successfully!",
+        "status": true,
+        "data": {}
+    }
+    ```
 
 #### **Orders**
 
@@ -172,7 +269,25 @@ A comprehensive backend API built with **Express** and **TypeScript**, designed 
      }
      ```
 
-    `totalPrice` is optional, if not provided, the application will calculate total price from the product (bicycle) collection
+   - `totalPrice` is optional, if not provided, the application will calculate total price from the product (bicycle) collection
+
+   - Response:
+
+    ```json
+    {
+    "message": "Order created successfully!",
+    "status": true,
+    "data": {
+            "email": "<abul@ab.vv>",
+            "product": "6742c11a49c1956daec11abd",
+            "quantity": 2,
+            "_id": "6743355c1fb2a11d437591a4",
+            "createdAt": "2024-11-24T14:17:00.399Z",
+            "updatedAt": "2024-11-24T14:17:00.399Z",
+            "totalPrice": 2800
+        }
+    }
+    ```
 
 2. **Get Revenue**
    - **GET** `/api/orders/revenue`
@@ -202,4 +317,30 @@ All error responses follow this structured format:
   },
   "stack": "Stack trace for the Error"
 }
+```
+
+- Example:
+
+```json
+{
+ "message": "BSONError: Invalid ObjectId",
+ "success": false,
+ "error": {
+  "name": "MongoDBCastError",
+  "errors": {
+   "_id": {
+    "message": "Invalid ObjectId: 6742c11a49c1956daec11abdb",
+    "name": "CastError",
+    "properties": {
+     "message": "Invalid ObjectId: 6742c11a49c1956daec11abdb",
+     "type": "ObjectId"
+    },
+    "kind": "ObjectId",
+    "path": "_id",
+    "value": "6742c11a49c1956daec11abdb"
+   }
+  }
+ },
+ "stack": "Error: Something went wrong\n    at path \"_id\" for model \"Product\"\n\n    at SchemaObjectId.cast..."
+ }
 ```
