@@ -2,7 +2,7 @@
 
 - [Live Server](https://bicycle-boulevard-server-nhb.vercel.app)
 
-A robust backend API built with **Express** and **TypeScript**, designed for managing bicycle inventory and orders with **MongoDB** and **Mongoose**. The server supports CRUD operations, advanced error handling, and comprehensive input validation powered by `Zod`.
+A robust backend API built with `Express` and `TypeScript`, designed for managing bicycle inventory and orders with `MongoDB` and `Mongoose`. The server supports CRUD operations, advanced error handling, and comprehensive input validation powered by `Zod` and custom error processor.
 
 ## Key Highlights
 
@@ -36,6 +36,15 @@ A robust backend API built with **Express** and **TypeScript**, designed for man
 - Clear and structured error messages to facilitate debugging.
 
 ---
+
+## Technologies (Packages) Used
+
+- `TypeScript`
+- `Node.js`
+- `Express.js`
+- `Mongoose`
+- `cors`
+- `dotenv`
 
 ## Run the Server Locally
 
