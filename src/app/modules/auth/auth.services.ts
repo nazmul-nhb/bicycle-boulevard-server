@@ -17,9 +17,9 @@ import type { ILoginCredentials, ITokens, IUser } from '../user/user.types';
 const registerUserInDB = async (payload: IUser) => {
 	const newUser = await User.create(payload);
 
-	const { _id, name, email } = newUser.toObject();
+	const { _id, name, email, image } = newUser.toObject();
 
-	const user = { _id, name, email };
+	const user = { _id, name, email, image };
 
 	return user;
 };

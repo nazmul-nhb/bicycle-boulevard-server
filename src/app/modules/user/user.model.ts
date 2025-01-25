@@ -18,6 +18,12 @@ const userSchema = new Schema<IUserDoc>(
 			trim: true,
 			unique: true,
 		},
+		image: {
+			type: String,
+			required: [true, 'Image is required!'],
+			trim: true,
+			unique: true,
+		},
 		password: {
 			type: String,
 			required: true,
