@@ -50,7 +50,7 @@ const getAllProductsFromDB = async (
 		filter.$or = [
 			{ name: { $regex: searchTerm, $options: 'i' } },
 			{ brand: { $regex: searchTerm, $options: 'i' } },
-			{ type: { $regex: searchTerm, $options: 'i' } },
+			{ category: { $regex: searchTerm, $options: 'i' } },
 		];
 	}
 

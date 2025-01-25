@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 import type { Query } from 'mongoose';
 import type { TProductDocument } from './product.types';
+import { PRODUCT_CATEGORIES } from './product.constants';
 
 const productSchema = new Schema<TProductDocument>(
 	{
@@ -21,10 +22,10 @@ const productSchema = new Schema<TProductDocument>(
 			required: [true, 'Product price is required!'],
 			min: [0, 'Product price must be a positive number!'],
 		},
-		type: {
+		category: {
 			type: String,
-			enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
-			required: [true, 'Product type is required!'],
+			enum: Object.values(PRODUCT_CATEGORIES),
+			required: [true, 'Product category is required!'],
 		},
 		description: {
 			type: String,

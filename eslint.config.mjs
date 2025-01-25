@@ -71,10 +71,10 @@ export default [
     files: ["src/server.ts"],
     rules: { "no-console": "off" },
   },
-  {
-    files: ['src/app/**/*types.ts', 'src/app/**/types/*.ts'],
-    rules: { "@typescript-eslint/no-explicit-any": "off" }
-  },
+  // {
+  //   files: ['src/app/**/*types.ts', 'src/app/**/types/*.ts'],
+  //   rules: { "@typescript-eslint/no-explicit-any": "off" }
+  // },
   {
     files: ['dist/**/*.js'],
     rules: { "@typescript-eslint/no-require-imports": "off" }

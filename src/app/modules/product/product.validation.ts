@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PRODUCT_CATEGORIES } from './product.constants';
 
 const creationSchema = z.object({
 	name: z
@@ -15,10 +16,12 @@ const creationSchema = z.object({
 		.number({ message: 'Price of the product is required!' })
 		.min(0, { message: 'Price must be a positive number!' }),
 
-	type: z.enum(['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'], {
-		message:
-			'Product type must be one of: Mountain, Road, Hybrid, BMX, Electric!',
-	}),
+	category: z.enum(
+		Object.values(PRODUCT_CATEGORIES) as [string, ...string[]],
+		{
+			message: `Product category must be one of: ${Object.values(PRODUCT_CATEGORIES).join(', ')}!`,
+		},
+	),
 
 	description: z
 		.string({ message: 'Description of the product is required!' })

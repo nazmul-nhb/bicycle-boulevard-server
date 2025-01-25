@@ -5,9 +5,7 @@ import sendResponse from '../../utilities/sendResponse';
 
 /** * Create a new product (bicycle). */
 const createProduct = catchAsync(async (req, res) => {
-	const productData = zodProduct.creationSchema.parse(req.body);
-
-	const product = await productServices.saveProductInDB(productData);
+	const product = await productServices.saveProductInDB(req.body);
 
 	sendResponse(res, 'Bicycle', 'POST', product);
 });

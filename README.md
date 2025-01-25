@@ -2,12 +2,12 @@
 
 - [Live Server](https://bicycle-boulevard-server-nhb.vercel.app)
 
-A robust backend API built with `Express` and `TypeScript`, designed for managing bicycle inventory and orders with `MongoDB` and `Mongoose`. The server supports CRUD operations, advanced error handling, and comprehensive input validation powered by `Zod` and custom error processor.
+A robust backend API built with `Express` and `TypeScript`, designed for managing bicycle inventory and orders with `MongoDB` and `Mongoose`. The server supports CRUD operations, advanced error handling, and comprehensive input validation powered by `Zod` and custom error processors.
 
 ## Key Highlights
 
 - **Bicycle and Order Management:** Simplified endpoints for adding, updating, and searching bicycles, with order processing and revenue tracking.
-- **Unified Error Handling:** Centralized handling for `schema validation`, `database operations`, and other potential failures using `UnifiedError` class.
+- **Custom Error Handling:** Centralized handling for `schema validation`, `database operations`, and other potential failures using custom utility functions.
 - **Custom Error Instance:** Used a class `ErrorWithStatus` to create custom instance of `Error`.
 
 ---
@@ -17,7 +17,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
 ### 🚴 Bicycle Management
 
 - Create, read, update, and delete bicycles.
-- Search for bicycles by `name`, `brand`, or `type`.
+- Search for bicycles by `name`, `brand`, or `category`.
 - Supports categories such as Mountain, Road, Hybrid, BMX, and Electric.
 
 ### 📦 Order Management
@@ -32,7 +32,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
 
 ### ⚙️ Error Handling
 
-- Unified error responses for `validation` (mostly `zod` and `MongoDB`), `duplication`, `casting` (MongoDB `ObjectId`), `parsing`, `insufficient`, `not found` and almost every possible types of errors.
+- Uniform error responses for `validation` (mostly `zod` and `MongoDB`), `duplication`, `casting` (MongoDB `ObjectId`), `parsing`, `insufficient`, `not found` and almost every possible types of errors.
 - Clear and structured error messages to facilitate debugging.
 
 ---
@@ -45,6 +45,9 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
 - `Mongoose`
 - `cors`
 - `dotenv`
+- `bcrypt`
+- `jsonwebtoken`
+- `cookie-parser`
 
 ## Run the Server Locally
 
@@ -134,7 +137,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
        "name": "Roadster 5000",
        "brand": "SpeedX",
        "price": 300,
-       "type": "Road",
+       "category": "Road",
        "description": "A premium road bike designed for speed and performance.",
        "quantity": 20,
        "inStock": true
@@ -151,7 +154,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
             "name": "Roadster 5000",
             "brand": "SpeedX",
             "price": 300,
-            "type": "Road",
+            "category": "Road",
             "description": "A premium road bike designed for speed and performance.",
             "quantity": 20,
             "inStock": true,
@@ -165,7 +168,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
 2. **Get All Bicycles**
    - **GET** `/api/products`
    - Query parameters: `searchTerm`
-   - Query example: `/api/products?searchTerm=partialValueOfField` (`searchTerm` can be any partial value of `name`, `brand`, `type`)
+   - Query example: `/api/products?searchTerm=partialValueOfField` (`searchTerm` can be any partial value of `name`, `brand`, `category`)
    - Response:
 
     ```json
@@ -178,7 +181,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
                 "name": "SpeedKing 500",
                 "brand": "Velocity",
                 "price": 1400,
-                "type": "Road",
+                "category": "Road",
                 "description": "Sleek road bike designed for speed enthusiasts.",
                 "quantity": 10,
                 "inStock": true,
@@ -190,7 +193,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
                 "name": "UrbanSprint",
                 "brand": "CityCyclers",
                 "price": 900,
-                "type": "Road",
+                "category": "Road",
                 "description": "Compact road bike perfect for urban commuting.",
                 "quantity": 20,
                 "inStock": true,
@@ -202,7 +205,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
                 "name": "Elite Strider",
                 "brand": "SwiftRiders",
                 "price": 1800,
-                "type": "Road",
+                "category": "Road",
                 "description": "Premium road bike for professional cyclists.",
                 "quantity": 4,
                 "inStock": true,
@@ -226,7 +229,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
             "name": "SpeedKing 500",
             "brand": "Velocity",
             "price": 1400,
-            "type": "Road",
+            "category": "Road",
             "description": "Sleek road bike designed for speed enthusiasts.",
             "quantity": 12,
             "inStock": true,
@@ -244,7 +247,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
      {
        "brand": "SpeedX",
        "price": 700,
-       "type": "Mountain",
+       "category": "Mountain",
        "quantity": 12,
      }
      ```
@@ -259,7 +262,7 @@ A robust backend API built with `Express` and `TypeScript`, designed for managin
             "name": "Roadster 5000",
             "brand": "SpeedX",
             "price": 700,
-            "type": "Mountain",
+            "category": "Mountain",
             "description": "A premium road bike designed for speed and performance.",
             "quantity": 12,
             "inStock": true,

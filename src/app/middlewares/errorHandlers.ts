@@ -1,9 +1,9 @@
 import chalk from 'chalk';
+import configs from '../configs';
 import { STATUS_CODES } from '../constants';
 import processErrors from '../errors/processErrors';
 import { ErrorWithStatus } from '../classes/ErrorWithStatus';
 import type { RequestHandler, ErrorRequestHandler } from 'express';
-import configs from '../configs';
 
 /** Middleware to Handle "Not Found" Errors.*/
 export const handleRouteNotFound: RequestHandler = (req, _res, next) => {
