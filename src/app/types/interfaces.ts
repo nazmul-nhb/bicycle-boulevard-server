@@ -1,4 +1,8 @@
-export interface IMongoDuplicateError {
+import type { Router } from 'express';
+import type { JwtPayload } from 'jsonwebtoken';
+import type { TUserRole } from '../modules/user/user.types';
+
+export interface IDuplicateError {
 	errorResponse: {
 		index: number;
 		code: number;
@@ -18,4 +22,30 @@ export interface IParserError {
 	status: number;
 	body: string;
 	type: string;
+}
+
+export interface INestedError {
+	errors: Record<string, unknown>;
+}
+
+export interface IErrorSource {
+	path: string | number;
+	message: string;
+}
+
+export interface IErrorResponse {
+	statusCode: number;
+	name: string;
+	errorSource: IErrorSource[];
+	stack?: string;
+}
+
+export interface IRoute {
+	path: string;
+	route: Router;
+}
+
+export interface BanguPayload extends JwtPayload {
+	email: string;
+	role: TUserRole;
 }

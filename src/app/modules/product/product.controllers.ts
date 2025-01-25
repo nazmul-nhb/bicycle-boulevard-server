@@ -1,206 +1,65 @@
-import type { Request, Response, NextFunction, RequestHandler } from 'express';
-import type {
-	RAllProducts,
-	RCreateProduct,
-	TProduct,
-	RSingleProduct,
-	TUpdateProduct,
-	TSearchQuery,
-} from './product.types';
+import { Schema } from 'mongoose';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
-import type { ObjectId } from 'mongoose';
-import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import catchAsync from '../../utilities/catchAsync';
+import sendResponse from '../../utilities/sendResponse';
 
-/**
- *
- * Create a new product (bicycle)
- */
-const createProduct = async (
-	req: Request<{}, {}, TProduct>,
-	res: Response<RCreateProduct>,
-	next: NextFunction,
-): Promise<Response<RCreateProduct> | void> => {
-	try {
-		const productData = zodProduct.creationSchema.parse(req.body);
+/** * Create a new product (bicycle). */
+const createProduct = catchAsync(async (req, res) => {
+	const productData = zodProduct.creationSchema.parse(req.body);
 
-		const product = await productServices.saveProductInDB(productData);
+	const product = await productServices.saveProductInDB(productData);
 
-		if (product) {
-			return res.status(201).json({
-				message: `Bicycle created successfully!`,
-				success: true,
-				data: product,
-			});
-		} else {
-			const serverError = new ErrorWithStatus(
-				'ProductCreationError',
-				`Failed to create the bicycle!`,
-				500,
-				'creation_failed',
-				productData.name,
-				'create_product',
-			);
-			next(serverError);
-		}
-	} catch (error) {
-		next(error);
+	sendResponse(res, 'Bicycle', 'POST', product);
+});
+
+/** * Get all student data from the DB. */
+const getAllProducts = catchAsync(async (req, res) => {
+	const { searchTerm } = req.query;
+
+	const products = await productServices.getAllProductsFromDB(
+		searchTerm as string,
+	);
+
+	sendResponse(res, 'Bicycle', 'GET', products);
+});
+
+/** * Get a single product (bicycle) data for a given mongodb `objectId`. */
+const getSingleProduct = catchAsync(async (req, res) => {
+	const id = new Schema.Types.ObjectId(req.params.id);
+
+	const product = await productServices.getSingleProductFromDB(id);
+
+	sendResponse(res, 'Bicycle', 'GET', product);
+});
+
+/** * Update a specific product (bicycle) by mongodb `objectId`. */
+const updateProduct = catchAsync(async (req, res) => {
+	const id = new Schema.Types.ObjectId(req.params.id);
+
+	const update = zodProduct.updateSchema.parse(req.body);
+
+	// If client wants to update quantity, handle it properly
+	if (update.quantity && update.quantity > 0) {
+		update.inStock = true;
 	}
-};
-
-/**
- *
- * Get all student data from the DB
- */
-const getAllProducts: RequestHandler<
-	{},
-	RAllProducts,
-	{},
-	TSearchQuery
-> = async (req, res, next) => {
-	try {
-		const { searchTerm } = req.query;
-
-		const products = await productServices.getAllProductsFromDB(searchTerm);
-
-		if (searchTerm && !products.length) {
-			const notFoundError = new ErrorWithStatus(
-				'QueryNotMatchedError',
-				`No bicycle matched with search term: ${searchTerm}!`,
-				404,
-				'not_matched',
-				searchTerm,
-				'search_products',
-			);
-			next(notFoundError);
-			return;
-		}
-		return res.status(200).json({
-			message: `Bicycles retrieved successfully!`,
-			status: true,
-			data: products,
-		});
-	} catch (error) {
-		next(error);
+	if (update.quantity && update.quantity <= 0) {
+		update.inStock = false;
 	}
-};
 
-/**
- *
- * Get a single product (bicycle) data for a given mongodb objectId
- */
-const getSingleProduct = async (
-	req: Request<{ id: ObjectId }>,
-	res: Response<RSingleProduct>,
-	next: NextFunction,
-): Promise<Response<RSingleProduct> | void> => {
-	try {
-		const { id } = req.params;
+	const product = await productServices.updateProductInDB(id, update);
 
-		const product = await productServices.getSingleProductFromDB(id);
+	sendResponse(res, 'Bicycle', 'PATCH', product);
+});
 
-		if (product) {
-			return res.status(200).json({
-				message: `Bicycle retrieved successfully!`,
-				status: true,
-				data: product,
-			});
-		} else {
-			const notFoundError = new ErrorWithStatus(
-				'ProductNotFoundError',
-				`No bicycle matched with id: ${id}!`,
-				404,
-				'not_found',
-				id.toString(),
-				'get_product',
-			);
-			next(notFoundError);
-		}
-	} catch (error) {
-		next(error);
-	}
-};
+/** * Mark a product as deleted by mongodb `objectId`. */
+const deleteProduct = catchAsync(async (req, res) => {
+	const id = new Schema.Types.ObjectId(req.params.id);
 
-/**
- *
- * Update a specific product (bicycle) by id
- */
-const updateProduct = async (
-	req: Request<{ id: ObjectId }, {}, TUpdateProduct>,
-	res: Response<RSingleProduct>,
-	next: NextFunction,
-): Promise<Response<RSingleProduct> | void> => {
-	try {
-		const { id } = req.params;
+	await productServices.deleteProductFromDB(id);
 
-		const update = zodProduct.updateSchema.parse(req.body);
-
-		// If client wants to update quantity, handle it properly
-		if (update.quantity && update.quantity > 0) {
-			update.inStock = true;
-		}
-		if (update.quantity && update.quantity <= 0) {
-			update.inStock = false;
-		}
-
-		const product = await productServices.updateProductInDB(id, update);
-
-		if (product) {
-			return res.status(200).json({
-				message: `Bicycle updated successfully!`,
-				status: true,
-				data: product,
-			});
-		} else {
-			const notFoundError = new ErrorWithStatus(
-				'ProductNotFoundError',
-				`Cannot update specified bicycle with id: ${id}!`,
-				404,
-				'not_found',
-				id.toString(),
-				'update_product',
-			);
-			next(notFoundError);
-		}
-	} catch (error) {
-		next(error);
-	}
-};
-
-/**
- * Mark a product as deleted by ID
- */
-const deleteProduct = async (
-	req: Request<{ id: ObjectId }>,
-	res: Response,
-	next: NextFunction,
-) => {
-	try {
-		const { id } = req.params;
-
-		const deleted = await productServices.deleteProductFromDB(id);
-
-		if (deleted) {
-			return res.status(200).json({
-				message: `Bicycle deleted successfully!`,
-				status: true,
-				data: {},
-			});
-		} else {
-			const notFoundError = new ErrorWithStatus(
-				'ProductNotFoundError',
-				`Cannot delete specified bicycle with id: ${id}!`,
-				404,
-				'not_found',
-				id.toString(),
-				'delete_product',
-			);
-			next(notFoundError);
-		}
-	} catch (error) {
-		next(error);
-	}
-};
+	sendResponse(res, 'Bicycle', 'DELETE');
+});
 
 export const productControllers = {
 	createProduct,

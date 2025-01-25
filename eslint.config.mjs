@@ -9,8 +9,7 @@ import prettierConfig from 'eslint-config-prettier';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    files: ['**/*.{js,mjs,cjs,ts}'],
-    ignores: ['node_modules', 'dist'],
+    ignores: ['node_modules/*', 'dist/*'],
   },
   {
     languageOptions: {
@@ -34,23 +33,50 @@ export default [
       ...tsEslintPlugin.configs.recommended.rules,
       ...prettierConfig.rules,
       'prettier/prettier': 'off',
-      'no-unused-vars': ['error', { 'varsIgnorePattern': '^_' }],
       'no-unused-expressions': 'error',
       'prefer-const': 'error',
-      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-console": ["warn", { "allow": ["info", "warn", "error"] }],
       'no-undef': 'error',
       "@typescript-eslint/no-empty-object-type": "off",
       '@typescript-eslint/no-unused-expressions': 'error',
       "@typescript-eslint/consistent-type-imports": ["warn", { "prefer": "type-imports" }],
-      "@typescript-eslint/no-unused-vars": ["error", { 'varsIgnorePattern': '^_' }]
+      "no-unused-vars": ["error", {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": false
+      }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_",
+          "destructuredArrayIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "ignoreRestSiblings": false
+        }
+      ]
     },
   },
   {
-    files: ["src/server.ts", "src/app/configs/**/*.ts"],
+    files: ["src/app/modules/**/*.types.ts", "src/app/modules/**/*.interfaces.ts"],
+    rules: { "no-unused-vars": "off" },
+  },
+  {
+    files: ["src/server.ts"],
     rules: { "no-console": "off" },
   },
   {
-    files: ['src/app/classes/**/*.ts'],
+    files: ['src/app/**/*types.ts', 'src/app/**/types/*.ts'],
     rules: { "@typescript-eslint/no-explicit-any": "off" }
+  },
+  {
+    files: ['dist/**/*.js'],
+    rules: { "@typescript-eslint/no-require-imports": "off" }
   }
 ];

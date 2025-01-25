@@ -1,4 +1,5 @@
 import path from 'path';
+import chalk from 'chalk';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
@@ -18,32 +19,40 @@ export const connectDB = async (): Promise<void> => {
 
 		await mongoose.connect(mongoUri);
 
-		console.log('🟢 MongoDB is Connected!');
+		console.info(chalk.cyanBright('🔗 MongoDB is Connected!'));
 
 		// Listen for established connection
 		mongoose.connection.on('connected', () => {
-			console.log('🟢 MongoDB is Connected!');
+			console.info(chalk.cyanBright('🔗 MongoDB is Connected!'));
 		});
 
 		// Listen for connection errors
 		mongoose.connection.on('error', (err) => {
-			console.error('🛑 MongoDB Connection Error: ', err.message);
+			console.error(
+				chalk.red(`⛔ MongoDB Connection Error: ${err.message}`),
+			);
 		});
 
 		// Optional: Listen for disconnection
 		mongoose.connection.on('disconnected', () => {
-			console.error('🔴 MongoDB is Disconnected!');
+			console.error(chalk.red('⛔ MongoDB is Disconnected!'));
 		});
 	} catch (error) {
 		if (error instanceof Error) {
-			console.error('🚫 MongoDB Error: ', error.message);
+			console.error(chalk.red(`🚫 MongoDB Error: ${error.message}`));
 		} else {
-			console.error('🛑 Unknown Error Occurred!');
+			console.error(chalk.red('🛑 Unknown Error Occurred!'));
 		}
 	}
 };
 
 export default {
+	NODE_ENV: process.env.NODE_ENV as string,
 	port: process.env.PORT || 4242,
+	saltRounds: Number(process.env.SALT_ROUNDS as string),
+	accessSecret: process.env.JWT_ACCESS_SECRET as string,
+	accessExpireTime: process.env.JWT_ACCESS_EXPIRES_IN as string,
+	refreshSecret: process.env.JWT_REFRESH_SECRET as string,
+	refreshExpireTime: process.env.JWT_REFRESH_EXPIRES_IN as string,
 	connectDB,
 };
