@@ -37,7 +37,9 @@ const orderSchema = new Schema<TOrderDocument>(
 
 // Calculate totalPrice if there is no hardcoded price in the request body
 orderSchema.pre('save', async function (next) {
-	const product = await Product.findById(this.product);
+	const productId = new Schema.Types.ObjectId(this.product as string);
+
+	const product = await Product.findById(productId);
 
 	if (product) {
 		if (!this.totalPrice) {
@@ -49,16 +51,12 @@ orderSchema.pre('save', async function (next) {
 		const productUpdate: TUpdateProduct = { quantity: remainingQuantity };
 
 		if (remainingQuantity < 0) {
-			const insufficientStock = new ErrorWithStatus(
+			throw new ErrorWithStatus(
 				' InsufficientStock',
 				`In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`,
 				409,
-				'insufficient_stock',
-				this.product.toString(),
 				'create_order',
 			);
-			next(insufficientStock);
-			return;
 		}
 
 		if (remainingQuantity <= 0) {
@@ -67,17 +65,14 @@ orderSchema.pre('save', async function (next) {
 
 		const sanitizedData = zodProduct.updateSchema.parse(productUpdate);
 
-		await productServices.updateProductInDB(this.product, sanitizedData);
+		await productServices.updateProductInDB(productId, sanitizedData);
 	} else {
-		const notFoundError = new ErrorWithStatus(
+		throw new ErrorWithStatus(
 			'NotFoundError',
-			`No bicycle found with id: ${this.product} to create an order!`,
+			`No bicycle found with id: ${productId} to create an order!`,
 			404,
-			'not_found',
-			this.product.toString(),
 			'create_order',
 		);
-		next(notFoundError);
 	}
 	next();
 });

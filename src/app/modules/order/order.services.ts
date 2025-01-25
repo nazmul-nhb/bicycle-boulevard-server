@@ -15,7 +15,7 @@ const saveOrderInDB = async (orderData: TOrder): Promise<TOrderDocument> => {
 };
 
 /**
- * 
+ *
  * Calculate total revenue for all the orders
  */
 const calculateOrderRevenue = async (): Promise<number> => {

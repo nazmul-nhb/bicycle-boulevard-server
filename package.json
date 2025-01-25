@@ -1,6 +1,6 @@
 {
 	"name": "bicycle-boulevard-server",
-	"version": "1.2.1",
+	"version": "1.2.9",
 	"description": "Express TypeScript Server for Bicycle Store - Bicycle Boulevard",
 	"author": {
 		"name": "Nazmul Hassan",
@@ -8,6 +8,7 @@
 	},
 	"main": "dist/server.js",
 	"scripts": {
+		"clean": "rimraf dist",
 		"build": "node build.mjs",
 		"dev": "nodemon",
 		"deploy": "node build.mjs && vercel --prod",

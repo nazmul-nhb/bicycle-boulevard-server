@@ -1,8 +1,9 @@
-import type { NextFunction, Request, Response } from 'express';
 import type { AnyZodObject, ZodEffects } from 'zod';
+import type { NextFunction, Request, Response } from 'express';
 
 /**
- * Middleware to validate the request body using a Zod schema.
+ * * Middleware to validate the request body using a Zod schema.
+ * 
  * @param schema A Zod validation schema/effects to validate the request body.
  * @returns An asynchronous Express middleware function.
  */

@@ -3,7 +3,7 @@ import type { TCollection, TMethod, TResponseDetails } from '../types';
 
 /**
  * * Sends a formatted JSON response.
- * 
+ *
  * @param res Response from Express.js from the specific controller.
  * @param collection The name of the collection (e.g., 'Student').
  * @param method The method type (e.g., 'POST', 'GET', 'PUT', 'PATCH', 'DELETE' etc.).
@@ -31,7 +31,7 @@ const sendResponse = <T>(
 
 /**
  * * Generates message and status code based on the collection and method type.
- * 
+ *
  * @param collection The name of the collection (e.g., 'Student').
  * @param method The method type (e.g., 'POST', 'GET', 'PUT', 'PATCH', 'DELETE' etc.).
  * @param data The data being operated upon.
@@ -56,9 +56,10 @@ const generateResponse = <T>(
 			message = `${collection} created successfully!`;
 			break;
 		case 'GET':
-			message = isArray
-				? `${collection}s fetched successfully!`
-				: `${collection} fetched successfully!`;
+			message =
+				isArray ?
+					`${collection}s fetched successfully!`
+				:	`${collection} fetched successfully!`;
 			break;
 		case 'PUT':
 		case 'PATCH':
