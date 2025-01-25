@@ -5,6 +5,8 @@ import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import productServices from '../product/product.services';
 import type { TUpdateProduct } from '../product/product.types';
 import { zodProduct } from '../product/product.validation';
+import { STATUS_CODES } from '../../constants';
+import { validateObjectId } from '../../utilities/validateObjectId';
 
 const orderSchema = new Schema<TOrderDocument>(
 	{
@@ -37,7 +39,9 @@ const orderSchema = new Schema<TOrderDocument>(
 
 // Calculate totalPrice if there is no hardcoded price in the request body
 orderSchema.pre('save', async function (next) {
-	const productId = new Schema.Types.ObjectId(this.product as string);
+	const productId = this.product as string;
+
+	validateObjectId(productId, 'product', 'create_order');
 
 	const product = await Product.findById(productId);
 
@@ -52,9 +56,9 @@ orderSchema.pre('save', async function (next) {
 
 		if (remainingQuantity < 0) {
 			throw new ErrorWithStatus(
-				' InsufficientStock',
+				'Insufficient Stock',
 				`In Stock: ${product.quantity}, but you ordered ${this.quantity} bicycles!`,
-				409,
+				STATUS_CODES.CONFLICT,
 				'create_order',
 			);
 		}
@@ -68,12 +72,13 @@ orderSchema.pre('save', async function (next) {
 		await productServices.updateProductInDB(productId, sanitizedData);
 	} else {
 		throw new ErrorWithStatus(
-			'NotFoundError',
+			'Not Found Error',
 			`No bicycle found with id: ${productId} to create an order!`,
-			404,
+			STATUS_CODES.NOT_FOUND,
 			'create_order',
 		);
 	}
+
 	next();
 });
 

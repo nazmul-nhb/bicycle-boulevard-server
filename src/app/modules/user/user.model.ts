@@ -3,6 +3,7 @@ import type { IUserDoc, IUserModel } from './user.types';
 import { hashPassword } from '../../utilities/authUtilities';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
+import { USER_ROLES } from './user.constants';
 
 const userSchema = new Schema<IUserDoc>(
 	{
@@ -25,12 +26,12 @@ const userSchema = new Schema<IUserDoc>(
 		},
 		role: {
 			type: String,
-			enum: ['user', 'admin'],
-			default: 'user',
+			enum: Object.values(USER_ROLES),
+			default: USER_ROLES.CUSTOMER,
 		},
-		isBlocked: {
+		isActive: {
 			type: Boolean,
-			default: false,
+			default: true,
 		},
 	},
 	{
@@ -68,7 +69,7 @@ userSchema.statics.validateUser = async function (email?: string) {
 		);
 	}
 
-	if (user.isBlocked) {
+	if (user.isActive) {
 		throw new ErrorWithStatus(
 			'Authentication Error',
 			`User with email ${email} is Blocked!`,

@@ -20,8 +20,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 // * Root/Test Route
-app.get('/', (_req: Request, res: Response) => {
-	sendResponse(res, 'N/A', 'OK', null, 'Server is Running! 🏃');
+app.get(['/', '/api'], (_req: Request, res: Response) => {
+	sendResponse(res, 'N/A', 'OK', null, '🚴‍♂️ Bicycle Server is Running! 🏃');
 });
 
 // * Application Routes

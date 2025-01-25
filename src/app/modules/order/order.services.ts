@@ -1,23 +1,29 @@
 import { Order } from './order.model';
+import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import type { TCalculatedRevenue, TOrder, TOrderDocument } from './order.types';
+import { STATUS_CODES } from '../../constants';
 
 /**
- *
+ * * Save product order(s) in DB.
  * @param orderData Accepts order data sent from client
  * @returns Saved order from MongoDB
  */
 const saveOrderInDB = async (orderData: TOrder): Promise<TOrderDocument> => {
-	const order = new Order(orderData);
+	const order = await Order.create(orderData);
 
-	const result = await order.save();
+	if (!order) {
+		throw new ErrorWithStatus(
+			'Internal Server Error',
+			`Failed to create order!`,
+			STATUS_CODES.INTERNAL_SERVER_ERROR,
+			'create_order',
+		);
+	}
 
-	return result;
+	return order;
 };
 
-/**
- *
- * Calculate total revenue for all the orders
- */
+/** * Calculate total revenue for all the orders */
 const calculateOrderRevenue = async (): Promise<number> => {
 	const revenue: TCalculatedRevenue[] = await Order.aggregate([
 		{

@@ -1,4 +1,3 @@
-import { Schema } from 'mongoose';
 import { zodProduct } from './product.validation';
 import productServices from './product.services';
 import catchAsync from '../../utilities/catchAsync';
@@ -26,7 +25,7 @@ const getAllProducts = catchAsync(async (req, res) => {
 
 /** * Get a single product (bicycle) data for a given mongodb `objectId`. */
 const getSingleProduct = catchAsync(async (req, res) => {
-	const id = new Schema.Types.ObjectId(req.params.id);
+	const { id } = req.params;
 
 	const product = await productServices.getSingleProductFromDB(id);
 
@@ -35,7 +34,7 @@ const getSingleProduct = catchAsync(async (req, res) => {
 
 /** * Update a specific product (bicycle) by mongodb `objectId`. */
 const updateProduct = catchAsync(async (req, res) => {
-	const id = new Schema.Types.ObjectId(req.params.id);
+	const { id } = req.params;
 
 	const update = zodProduct.updateSchema.parse(req.body);
 
@@ -54,7 +53,7 @@ const updateProduct = catchAsync(async (req, res) => {
 
 /** * Mark a product as deleted by mongodb `objectId`. */
 const deleteProduct = catchAsync(async (req, res) => {
-	const id = new Schema.Types.ObjectId(req.params.id);
+	const { id } = req.params;
 
 	await productServices.deleteProductFromDB(id);
 

@@ -7,7 +7,6 @@ import {
 	generateToken,
 	verifyToken,
 } from '../../utilities/authUtilities';
-import type { BanguPayload } from '../../types/interfaces';
 import type { ILoginCredentials, ITokens, IUser } from '../user/user.types';
 
 /**
@@ -50,7 +49,7 @@ const loginUser = async (payload: ILoginCredentials): Promise<ITokens> => {
 	}
 
 	// * Create tokens and send to the client.
-	const jwtPayload: BanguPayload = {
+	const jwtPayload = {
 		email: user.email,
 		role: user.role,
 	};

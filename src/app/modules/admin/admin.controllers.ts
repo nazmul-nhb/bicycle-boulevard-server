@@ -1,24 +1,14 @@
-import { Types } from 'mongoose';
 import catchAsync from '../../utilities/catchAsync';
 import sendResponse from '../../utilities/sendResponse';
 import { adminServices } from './admin.services';
 
 /** Block a user */
-const blockUser = catchAsync(async (req, res) => {
-	const id = new Types.ObjectId(req.params.id);
+const deactivateUser = catchAsync(async (req, res) => {
+	const { id } = req.params;
 
-	const result = await adminServices.blockUserInDB(id, req?.user);
+	const message = await adminServices.deactivateUserInDB(id, req?.user);
 
-	sendResponse(res, 'Blog', 'PATCH', null, result);
+	sendResponse(res, 'User', 'PATCH', null, message);
 });
 
-/** Delete a blog */
-const deleteBlog = catchAsync(async (req, res) => {
-	const id = new Types.ObjectId(req.params.id);
-
-	await adminServices.deleteBlogFromDB(id, req?.user);
-
-	sendResponse(res, 'Blog', 'DELETE');
-});
-
-export const adminControllers = { blockUser, deleteBlog };
+export const adminControllers = { deactivateUser };

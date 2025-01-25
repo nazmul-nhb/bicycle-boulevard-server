@@ -1,64 +1,28 @@
-import type { Request, Response, NextFunction } from 'express';
-import type { RCreateOrder, ROrderRevenue, TOrder } from './order.types';
 import { zodOrder } from './order.validation';
 import orderServices from './order.services';
-import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import catchAsync from '../../utilities/catchAsync';
+import sendResponse from '../../utilities/sendResponse';
 
-/**
- *
- * Create a new order
- */
-const createOrder = async (
-	req: Request<{}, {}, TOrder>,
-	res: Response<RCreateOrder>,
-	next: NextFunction,
-): Promise<Response<RCreateOrder> | void> => {
-	try {
-		const orderData = zodOrder.creationSchema.parse(req.body);
+/** * Create a new order */
+const createOrder = catchAsync(async (req, res) => {
+	const orderData = zodOrder.creationSchema.parse(req.body);
 
-		const order = await orderServices.saveOrderInDB(orderData);
+	const order = await orderServices.saveOrderInDB(orderData);
 
-		if (order) {
-			return res.status(201).json({
-				message: `Order created successfully!`,
-				status: true,
-				data: order,
-			});
-		} else {
-			const serverError = new ErrorWithStatus(
-				'ProductCreationError',
-				`Failed to create the bicycle!`,
-				500,
-				'creation_failed',
-				orderData.product,
-				'create_product',
-			);
-			next(serverError);
-		}
-	} catch (error) {
-		next(error);
-	}
-};
+	sendResponse(res, 'Order', 'GET', order, 'Order created successfully!');
+});
 
-/**
- * Get Revenue from Orders
- */
-const getOrderRevenue = async (
-	_req: Request,
-	res: Response<ROrderRevenue>,
-	next: NextFunction,
-): Promise<Response<ROrderRevenue> | void> => {
-	try {
-		const totalRevenue = await orderServices.calculateOrderRevenue();
+/** * Get Revenue from Orders */
+const getOrderRevenue = catchAsync(async (_req, res) => {
+	const totalRevenue = await orderServices.calculateOrderRevenue();
 
-		return res.status(200).json({
-			message: 'Revenue calculated successfully!',
-			status: true,
-			data: { totalRevenue },
-		});
-	} catch (error) {
-		next(error);
-	}
-};
+	sendResponse(
+		res,
+		'Order',
+		'GET',
+		{ totalRevenue },
+		'Revenue calculated successfully!',
+	);
+});
 
 export default { createOrder, getOrderRevenue };

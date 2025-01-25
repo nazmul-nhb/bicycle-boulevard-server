@@ -1,4 +1,4 @@
-import type { FilterQuery, ObjectId } from 'mongoose';
+import type { FilterQuery } from 'mongoose';
 import type {
 	TProduct,
 	TProductDocument,
@@ -7,6 +7,8 @@ import type {
 } from './product.types';
 import { Product } from './product.model';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import { STATUS_CODES } from '../../constants';
+import { validateObjectId } from '../../utilities/validateObjectId';
 
 /**
  * * Create a new product in DB.
@@ -21,9 +23,9 @@ const saveProductInDB = async (
 
 	if (!product) {
 		throw new ErrorWithStatus(
-			'ProductCreationError',
+			'Internal Server Error',
 			`Failed to create the bicycle!`,
-			500,
+			STATUS_CODES.INTERNAL_SERVER_ERROR,
 			'create_product',
 		);
 	}
@@ -36,6 +38,7 @@ const saveProductInDB = async (
 /**
  * * Get all products from DB.
  *
+ * @param searchTerm Search keyword.
  * @returns Returns all product data from the DB
  */
 const getAllProductsFromDB = async (
@@ -55,9 +58,9 @@ const getAllProductsFromDB = async (
 
 	if (searchTerm && products.length < 1) {
 		throw new ErrorWithStatus(
-			'QueryNotMatchedError',
+			'Not Matched Error',
 			`No bicycle matched with search term: ${searchTerm}!`,
-			404,
+			STATUS_CODES.NOT_FOUND,
 			'search_products',
 		);
 	}
@@ -72,15 +75,17 @@ const getAllProductsFromDB = async (
  * @returns Returns matched product data from MongoDB or nothing
  */
 const getSingleProductFromDB = async (
-	id: ObjectId,
+	id: string,
 ): Promise<TProductDocument> => {
+	validateObjectId(id, 'product', 'get_product');
+
 	const product = await Product.findById(id);
 
 	if (!product) {
 		throw new ErrorWithStatus(
-			'ProductNotFoundError',
+			'Not Found Error',
 			`No bicycle found with id: ${id}!`,
-			404,
+			STATUS_CODES.NOT_FOUND,
 			'get_product',
 		);
 	}
@@ -95,18 +100,20 @@ const getSingleProductFromDB = async (
  * @returns Returns updated product data from MongoDB if updates any
  */
 const updateProductInDB = async (
-	id: ObjectId,
+	id: string,
 	update: TUpdateProduct,
 ): Promise<TProductDocument> => {
+	validateObjectId(id, 'product', 'update_product');
+
 	const updateOptions = [{ _id: id }, update, { new: true, rawResult: true }];
 
 	const updatedProduct = await Product.findOneAndUpdate(...updateOptions);
 
 	if (!updatedProduct) {
 		throw new ErrorWithStatus(
-			'ProductNotFoundError',
+			'Not Found Error',
 			`Cannot update specified bicycle with id: ${id}!`,
-			404,
+			STATUS_CODES.NOT_FOUND,
 			'update_product',
 		);
 	}
@@ -120,7 +127,9 @@ const updateProductInDB = async (
  * @param id Accepts custom product ID to identify a product.
  * @returns Returns updated (mark as deleted) product data from MongoDB if updates any.
  */
-const deleteProductFromDB = async (id: ObjectId): Promise<TProductDocument> => {
+const deleteProductFromDB = async (id: string): Promise<TProductDocument> => {
+	validateObjectId(id, 'product', 'delete_product');
+
 	const product = await Product.findByIdAndUpdate(
 		id,
 		{ isDeleted: true },
@@ -129,9 +138,9 @@ const deleteProductFromDB = async (id: ObjectId): Promise<TProductDocument> => {
 
 	if (!product) {
 		throw new ErrorWithStatus(
-			'ProductNotFoundError',
+			'Not Found Error',
 			`Cannot delete specified bicycle with id: ${id}!`,
-			404,
+			STATUS_CODES.NOT_FOUND,
 			'delete_product',
 		);
 	}

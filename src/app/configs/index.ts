@@ -2,14 +2,13 @@ import path from 'path';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import type { ms } from '../..';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 const mongoUri = process.env.MONGO_URI as string;
 
-/**
- * Connect to MongoDB using Mongoose
- */
+/** * Connect to MongoDB using Mongoose. */
 export const connectDB = async (): Promise<void> => {
 	try {
 		// Throw error if there is no connection string
@@ -51,8 +50,8 @@ export default {
 	port: process.env.PORT || 4242,
 	saltRounds: Number(process.env.SALT_ROUNDS as string),
 	accessSecret: process.env.JWT_ACCESS_SECRET as string,
-	accessExpireTime: process.env.JWT_ACCESS_EXPIRES_IN as string,
+	accessExpireTime: process.env.JWT_ACCESS_EXPIRES_IN as ms.StringValue,
 	refreshSecret: process.env.JWT_REFRESH_SECRET as string,
-	refreshExpireTime: process.env.JWT_REFRESH_EXPIRES_IN as string,
+	refreshExpireTime: process.env.JWT_REFRESH_EXPIRES_IN as ms.StringValue,
 	connectDB,
 };

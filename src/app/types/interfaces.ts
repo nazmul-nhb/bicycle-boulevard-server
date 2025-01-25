@@ -45,7 +45,7 @@ export interface IRoute {
 	route: Router;
 }
 
-export interface BanguPayload extends JwtPayload {
+export interface DecodedUser extends JwtPayload {
 	email: string;
 	role: TUserRole;
 }

@@ -1,14 +1,14 @@
 import type { Document, Model, Types } from 'mongoose';
-import type { USER_ROLE } from './user.constants';
+import type { USER_ROLES } from './user.constants';
 
-export type TUserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
+export type TUserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export interface IUser {
 	name: string;
 	email: string;
 	password: string;
 	role: TUserRole;
-	isBlocked?: boolean;
+	isActive?: boolean;
 }
 
 export interface ILoginCredentials {

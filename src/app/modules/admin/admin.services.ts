@@ -1,18 +1,19 @@
-import { Blog } from '../blog/blog.model';
 import { User } from '../user/user.model';
-import type { Types } from 'mongoose';
-import type { BanguPayload } from '../../types/interfaces';
+import type { DecodedUser } from '../../types/interfaces';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
+import { validateObjectId } from '../../utilities/validateObjectId';
 
 /**
- * Block a user in MongoDB by updating the `isBlocked` field to `true`.
+ * * Deactivate a user in MongoDB by updating the `isActive` field to `false`.
  * @param id User ID to block.
  * @param admin Current logged in user (admin) from decoded token.
  * @returns A message indicating the result of the operation.
  */
-const blockUserInDB = async (id: Types.ObjectId, admin?: BanguPayload) => {
-	if (admin?.role !== 'admin') {
+const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
+	validateObjectId(id, 'user', 'deactivate_user');
+
+	if (!admin || admin?.role !== 'admin') {
 		throw new ErrorWithStatus(
 			'Authorization Error',
 			'You do not have permission to block this user!',
@@ -32,7 +33,7 @@ const blockUserInDB = async (id: Types.ObjectId, admin?: BanguPayload) => {
 		);
 	}
 
-	if (user.isBlocked) {
+	if (user.isActive) {
 		throw new ErrorWithStatus(
 			'Already Blocked',
 			`${user.name} is already blocked!`,
@@ -41,7 +42,7 @@ const blockUserInDB = async (id: Types.ObjectId, admin?: BanguPayload) => {
 		);
 	}
 
-	const result = await User.updateOne({ _id: id }, { isBlocked: true });
+	const result = await User.updateOne({ _id: id }, { isActive: false });
 
 	if (result.modifiedCount < 1) {
 		throw new ErrorWithStatus(
@@ -52,36 +53,7 @@ const blockUserInDB = async (id: Types.ObjectId, admin?: BanguPayload) => {
 		);
 	}
 
-	return 'User blocked successfully!';
+	return 'User is Deactivated successfully!';
 };
 
-/**
- * Delete a blog from MongoDB for 'admin`.
- * @param id Blog ID to delete.
- * @param admin Current logged in user (admin) from decoded token.
- */
-const deleteBlogFromDB = async (id: Types.ObjectId, admin?: BanguPayload) => {
-	const currentUser = await User.validateUser(admin?.email);
-
-	if (currentUser.role !== 'admin') {
-		throw new ErrorWithStatus(
-			'Authorization Error',
-			'You do not have permission to delete this blog!',
-			STATUS_CODES.UNAUTHORIZED,
-			'auth',
-		);
-	}
-
-	const result = await Blog.deleteOne({ _id: id });
-
-	if (result.deletedCount < 1) {
-		throw new ErrorWithStatus(
-			'Not Found Error',
-			`No blog found with ID ${id}!`,
-			STATUS_CODES.NOT_FOUND,
-			'blog',
-		);
-	}
-};
-
-export const adminServices = { blockUserInDB, deleteBlogFromDB };
+export const adminServices = { deactivateUserInDB };
