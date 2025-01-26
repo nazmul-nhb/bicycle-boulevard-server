@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import router from './app/routes';
+import configs from './app/configs';
 import cookieParser from 'cookie-parser';
 import sendResponse from './app/utilities/sendResponse';
 import type { Application, Request, Response } from 'express';
@@ -13,7 +14,16 @@ import {
 const app: Application = express();
 
 // * Respect CORS Policy
-app.use(cors());
+app.use(
+	cors({
+		origin:
+			configs.NODE_ENV === 'development' ?
+				'http://localhost:5173'
+			:	'https://bicycle-boulevard-nhb.vercel.app',
+		credentials: true,
+	}),
+);
+
 // * Use Cookie Parser
 app.use(cookieParser());
 // * Use JSON Parser
