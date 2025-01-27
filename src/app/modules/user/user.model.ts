@@ -75,10 +75,10 @@ userSchema.statics.validateUser = async function (email?: string) {
 		);
 	}
 
-	if (user.isActive) {
+	if (!user.isActive) {
 		throw new ErrorWithStatus(
 			'Authentication Error',
-			`User with email ${email} is Blocked!`,
+			`User with email ${email} is not active!`,
 			STATUS_CODES.FORBIDDEN,
 			'user',
 		);
