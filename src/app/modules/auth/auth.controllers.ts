@@ -1,4 +1,3 @@
-import { generateRandomID } from 'nhb-toolbox';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import configs from '../../configs';
 import { STATUS_CODES } from '../../constants';
@@ -7,15 +6,19 @@ import sendResponse from '../../utilities/sendResponse';
 import { sendImageToCloudinary } from '../../utilities/uploadImage';
 import { User } from '../user/user.model';
 import { authServices } from './auth.services';
+import type { IUser } from '../user/user.types';
+import { generateFileName } from '../../utilities/generateFileName';
 
-/** Register a new user */
+/** * Register a new user */
 const registerUser = catchAsync(async (req, res) => {
-	const existingUser = await User.findOne({ email: req.body.email });
+	const userToCreate = req.body as IUser;
+
+	const existingUser = await User.findOne({ email: userToCreate.email });
 
 	if (existingUser) {
 		throw new ErrorWithStatus(
 			'Duplicate Error',
-			`User already exists with email: ${req.body.email}!`,
+			`User already exists with email: ${userToCreate.email}!`,
 			STATUS_CODES.CONFLICT,
 			'register_user',
 		);
@@ -30,14 +33,7 @@ const registerUser = catchAsync(async (req, res) => {
 		);
 	}
 
-	const fileName = generateRandomID({
-		suffix: req.body.name,
-		caseOption: 'lower',
-		prefix: 'bicycle',
-		timeStamp: true,
-		separator: '_',
-		length: 6,
-	});
+	const fileName = generateFileName(userToCreate.name);
 
 	const { secure_url } = await sendImageToCloudinary(
 		fileName,
@@ -45,14 +41,14 @@ const registerUser = catchAsync(async (req, res) => {
 	);
 
 	const user = await authServices.registerUserInDB({
-		...req.body,
+		...userToCreate,
 		image: secure_url.split(configs.imageBaseUrl)[1],
 	});
 
 	sendResponse(res, 'User', 'POST', user, 'User registered successfully!');
 });
 
-/** Login a user */
+/** * Login a user */
 const loginUser = catchAsync(async (req, res) => {
 	const tokens = await authServices.loginUser(req.body);
 
@@ -72,19 +68,31 @@ const loginUser = catchAsync(async (req, res) => {
 	);
 });
 
-/** Generate new access token. */
+/** * Generate new access token. */
 const refreshToken = catchAsync(async (req, res) => {
 	const { refreshToken } = req.cookies;
 
-	const result = await authServices.refreshToken(refreshToken);
+	const token = await authServices.refreshToken(refreshToken);
 
 	sendResponse(
 		res,
 		'N/A',
 		'OK',
-		result,
+		token,
 		'Successfully retrieved new access token!',
 	);
 });
 
-export const authControllers = { registerUser, loginUser, refreshToken };
+/** * Get current logged in user. */
+const getCurrentUser = catchAsync(async (req, res) => {
+	const user = await authServices.getCurrentUserFromDB(req.user);
+
+	sendResponse(res, 'User', 'GET', user);
+});
+
+export const authControllers = {
+	registerUser,
+	loginUser,
+	refreshToken,
+	getCurrentUser,
+};

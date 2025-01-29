@@ -5,6 +5,8 @@ import { authControllers } from './auth.controllers';
 import { authValidations } from './auth.validation';
 import { uploadFile } from '../../utilities/uploadImage';
 import { parseFormData } from '../../middlewares/parseFormData';
+import authorizeUser from '../../middlewares/authorizeUser';
+import { USER_ROLES } from '../user/user.constants';
 
 const router = Router();
 
@@ -23,5 +25,11 @@ router.post(
 );
 
 router.post('/refresh-token', authControllers.refreshToken);
+
+router.get(
+	'/profile',
+	authorizeUser(USER_ROLES.CUSTOMER, USER_ROLES.ADMIN),
+	authControllers.getCurrentUser,
+);
 
 export const authRoutes = router;

@@ -29,3 +29,9 @@ export interface IUserDoc extends IUser, Document {
 export interface IUserModel extends Model<IUserDoc> {
 	validateUser(email?: string): Promise<IUserDoc>;
 }
+
+export interface ICurrentUser extends Omit<IUser, 'password'> {
+	_id: Types.ObjectId;
+	createdAt: string;
+	updatedAt: string;
+}

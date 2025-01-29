@@ -7,7 +7,8 @@ import {
 	generateToken,
 	verifyToken,
 } from '../../utilities/authUtilities';
-import type { ILoginCredentials, ITokens, IUser } from '../user/user.types';
+import type { ICurrentUser, ILoginCredentials, ITokens, IUser } from '../user/user.types';
+import type { DecodedUser } from '../../types/interfaces';
 
 /**
  * Create a new user in MongoDB `user` collection.
@@ -96,4 +97,18 @@ const refreshToken = async (token: string): Promise<{ token: string }> => {
 	return { token: accessToken };
 };
 
-export const authServices = { registerUserInDB, loginUser, refreshToken };
+/** * Get current user from DB. */
+const getCurrentUserFromDB = async (client?: DecodedUser) => {
+	const user = await User.validateUser(client?.email);
+
+	const {password: _, ...userInfo  } = user.toObject()
+
+	return { ...client, ...(userInfo as ICurrentUser) };
+};
+
+export const authServices = {
+	registerUserInDB,
+	loginUser,
+	refreshToken,
+	getCurrentUserFromDB,
+};
