@@ -10,7 +10,7 @@ import {
 	handleRouteNotFound,
 } from './app/middlewares/errorHandlers';
 
-// Create an Express App
+// * Create an Express App
 const app: Application = express();
 
 // * Respect CORS Policy

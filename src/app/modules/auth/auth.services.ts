@@ -7,7 +7,12 @@ import {
 	generateToken,
 	verifyToken,
 } from '../../utilities/authUtilities';
-import type { ICurrentUser, ILoginCredentials, ITokens, IUser } from '../user/user.types';
+import type {
+	ICurrentUser,
+	ILoginCredentials,
+	ITokens,
+	IUser,
+} from '../user/user.types';
 import type { DecodedUser } from '../../types/interfaces';
 
 /**
@@ -26,7 +31,7 @@ const registerUserInDB = async (payload: IUser) => {
 };
 
 /**
- * Login user.
+ * * Login user.
  * @param payload Login credentials (`email` and `password`).
  * @returns Token as object.
  */
@@ -67,7 +72,9 @@ const loginUser = async (payload: ILoginCredentials): Promise<ITokens> => {
 		configs.refreshExpireTime,
 	);
 
-	return { accessToken, refreshToken };
+	const { password: _, ...userInfo } = user.toObject();
+
+	return { accessToken, refreshToken, user: userInfo as ICurrentUser };
 };
 
 /**
@@ -101,9 +108,9 @@ const refreshToken = async (token: string): Promise<{ token: string }> => {
 const getCurrentUserFromDB = async (client?: DecodedUser) => {
 	const user = await User.validateUser(client?.email);
 
-	const {password: _, ...userInfo  } = user.toObject()
+	const { password: _, ...userInfo } = user.toObject();
 
-	return { ...client, ...(userInfo as ICurrentUser) };
+	return userInfo as ICurrentUser;
 };
 
 export const authServices = {

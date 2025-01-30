@@ -39,10 +39,8 @@ export const catchAllErrors: ErrorRequestHandler = (err, _req, res, next) => {
 	res.status(statusCode).json({
 		success: false,
 		message: errorSource.map((err) => err.message).join(' | '),
-		statusCode,
-		error: {
-			details: errorSource.map((source) => ({ name, ...source })),
-		},
+		status: statusCode,
+		errors: errorSource.map((source) => ({ name, ...source })),
 
 		...(configs.NODE_ENV === 'development' && {
 			stack: stack ? stack : 'Stack Trace Not Available!',

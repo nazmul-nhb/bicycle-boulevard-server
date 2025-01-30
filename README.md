@@ -344,15 +344,14 @@ All error responses follow this structured format:
   "success": false,
   "message": "Error message",
   "statusCode": 400,
-  "error": { "details": [
-         {
-           "name": "Error name",
-           "path": "where error occurred if traced",
-           "message": "Error message"
-         },
-         {...}
-      ]
-   },
+  "errors": [
+      {
+        "name": "Error name",
+        "path": "where error occurred if traced",
+        "message": "Error message"
+      },
+      {...}
+  ],
   "stack": "Error stack trace if available" // Only in development
 }
 ```

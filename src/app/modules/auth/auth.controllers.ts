@@ -50,9 +50,9 @@ const registerUser = catchAsync(async (req, res) => {
 
 /** * Login a user */
 const loginUser = catchAsync(async (req, res) => {
-	const tokens = await authServices.loginUser(req.body);
+	const result = await authServices.loginUser(req.body);
 
-	const { refreshToken, accessToken } = tokens;
+	const { refreshToken, accessToken, user } = result;
 
 	res.cookie('refreshToken', refreshToken, {
 		secure: configs.NODE_ENV === 'production',
@@ -63,7 +63,7 @@ const loginUser = catchAsync(async (req, res) => {
 		res,
 		'User',
 		'OK',
-		{ token: accessToken },
+		{ user, token: accessToken },
 		'Login successful!',
 	);
 });
