@@ -2,10 +2,40 @@ import { zodProduct } from './product.validation';
 import productServices from './product.services';
 import catchAsync from '../../utilities/catchAsync';
 import sendResponse from '../../utilities/sendResponse';
+import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import { STATUS_CODES } from '../../constants';
+import { generateFileName } from '../../utilities/generateFileName';
+import type { TProduct } from './product.types';
+import { sendImageToCloudinary } from '../../utilities/uploadImage';
+import configs from '../../configs';
 
 /** * Create a new product (bicycle). */
 const createProduct = catchAsync(async (req, res) => {
-	const product = await productServices.saveProductInDB(req.body);
+	const productToCreate = req.body as TProduct;
+
+	if (!req.file) {
+		throw new ErrorWithStatus(
+			'Image Required',
+			`Require image to create new product!`,
+			STATUS_CODES.BAD_REQUEST,
+			'create_product',
+		);
+	}
+
+	const fileName = generateFileName(productToCreate.name);
+
+	const { secure_url } = await sendImageToCloudinary(
+		fileName,
+		req.file.buffer,
+	);
+
+	const product = await productServices.saveProductInDB(
+		{
+			...productToCreate,
+			image: secure_url.split(configs.imageBaseUrl)[1],
+		},
+		req?.user?.email,
+	);
 
 	sendResponse(res, 'Bicycle', 'POST', product);
 });

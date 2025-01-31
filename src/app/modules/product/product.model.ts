@@ -17,6 +17,11 @@ const productSchema = new Schema<TProductDocument>(
 			trim: true,
 			minlength: [1, 'Product brand must not be empty!'],
 		},
+		image: {
+			type: String,
+			required: [true, 'Product image is required!'],
+			minlength: [1, 'Product image link must not be empty!'],
+		},
 		price: {
 			type: Number,
 			required: [true, 'Product price is required!'],
@@ -37,6 +42,11 @@ const productSchema = new Schema<TProductDocument>(
 			type: Number,
 			required: [true, 'Product quantity is required!'],
 			min: [0, 'Quantity must be a non-negative number!'],
+		},
+		createdBy: {
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+			required: [true, 'User ID is required!'],
 		},
 		inStock: {
 			type: Boolean,

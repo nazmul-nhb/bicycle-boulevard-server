@@ -9,6 +9,7 @@ import { Product } from './product.model';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
 import { validateObjectId } from '../../utilities/validateObjectId';
+import { User } from '../user/user.model';
 
 /**
  * * Create a new product in DB.
@@ -18,8 +19,14 @@ import { validateObjectId } from '../../utilities/validateObjectId';
  */
 const saveProductInDB = async (
 	productData: TProduct,
+	email?: string,
 ): Promise<TProductNotDeleted> => {
-	const product = await Product.create(productData);
+	const user = await User.validateUser(email);
+
+	const product = await Product.create({
+		...productData,
+		createdBy: user._id,
+	});
 
 	if (!product) {
 		throw new ErrorWithStatus(
