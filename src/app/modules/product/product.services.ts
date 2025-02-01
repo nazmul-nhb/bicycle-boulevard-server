@@ -1,15 +1,15 @@
 import type { FilterQuery } from 'mongoose';
-import type {
-	TProduct,
-	TProductDocument,
-	TProductNotDeleted,
-	TUpdateProduct,
-} from './product.types';
-import { Product } from './product.model';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
 import { validateObjectId } from '../../utilities/validateObjectId';
 import { User } from '../user/user.model';
+import { Product } from './product.model';
+import type {
+	TMinimalProduct,
+	TProduct,
+	TProductDocument,
+	TUpdateProduct,
+} from './product.types';
 
 /**
  * * Create a new product in DB.
@@ -17,10 +17,7 @@ import { User } from '../user/user.model';
  * @param productData Accepts product data sent from client
  * @returns Saved product from MongoDB
  */
-const saveProductInDB = async (
-	productData: TProduct,
-	email?: string,
-): Promise<TProductNotDeleted> => {
+const saveProductInDB = async (productData: TProduct, email?: string) => {
 	const user = await User.validateUser(email);
 
 	const product = await Product.create({
@@ -31,15 +28,16 @@ const saveProductInDB = async (
 	if (!product) {
 		throw new ErrorWithStatus(
 			'Internal Server Error',
-			`Failed to create the bicycle!`,
+			`Failed to create bicycle!`,
 			STATUS_CODES.INTERNAL_SERVER_ERROR,
 			'create_product',
 		);
 	}
 
-	const { isDeleted: _skip, ...resultWithoutIsDeleted } = product.toObject();
+	const { description: _skip, ...resultWithoutIsDeleted } =
+		product.toObject();
 
-	return resultWithoutIsDeleted as TProductNotDeleted;
+	return resultWithoutIsDeleted as TMinimalProduct;
 };
 
 /**

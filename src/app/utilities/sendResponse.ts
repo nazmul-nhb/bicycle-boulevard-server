@@ -22,7 +22,7 @@ const sendResponse = <T>(
 	const response = {
 		success: true,
 		message: customMessage ? customMessage : message,
-		statusCode,
+		status: statusCode,
 		...(data && { data }),
 	};
 

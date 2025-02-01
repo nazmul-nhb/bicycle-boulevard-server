@@ -1,6 +1,6 @@
+import type { Document, Types } from 'mongoose';
 import type { z } from 'zod';
 import type { zodProduct } from './product.validation';
-import type { Document, Types } from 'mongoose';
 
 export type TProduct = z.infer<typeof zodProduct.creationSchema> & {
 	image: string;
@@ -12,8 +12,6 @@ export type TUpdateProduct = z.infer<typeof zodProduct.updateSchema>;
 
 export type TProductDocument = TProduct & Document;
 
-export type TProductNotDeleted = Omit<TProductDocument, 'isDeleted'> & {
-	createdBy: Types.ObjectId;
-};
+export type TMinimalProduct = Omit<TProductDocument, 'description'> & {};
 
 export type TSearchQuery = { searchTerm?: string };
