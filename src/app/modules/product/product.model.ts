@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import type { Query } from 'mongoose';
+// import type { Query } from 'mongoose';
 import type { TProductDocument } from './product.types';
 import { PRODUCT_CATEGORIES } from './product.constants';
 
@@ -67,12 +67,12 @@ const productSchema = new Schema<TProductDocument>(
 
 // Get products that are not deleted
 // And remove `isDeleted` field before returning the document
-productSchema.pre(/^find/, function (next) {
-	const query = this as Query<TProductDocument, TProductDocument>;
+// productSchema.pre(/^find/, function (next) {
+// 	const query = this as Query<TProductDocument, TProductDocument>;
 
-	query.find({ isDeleted: { $ne: true } }).projection({ isDeleted: 0 });
+// 	query.find({ isDeleted: { $ne: true } }).projection({ isDeleted: 0 });
 
-	next();
-});
+// 	next();
+// });
 
 export const Product = model<TProductDocument>('Product', productSchema);

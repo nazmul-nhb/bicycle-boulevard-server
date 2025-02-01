@@ -46,9 +46,7 @@ const saveProductInDB = async (productData: TProduct, email?: string) => {
  * @param searchTerm Search keyword.
  * @returns Returns all product data from the DB
  */
-const getAllProductsFromDB = async (
-	searchTerm?: string,
-): Promise<TProductDocument[]> => {
+const getAllProductsFromDB = async (searchTerm?: string) => {
 	const filter: FilterQuery<TProductDocument> = {};
 
 	if (searchTerm) {
@@ -59,7 +57,7 @@ const getAllProductsFromDB = async (
 		];
 	}
 
-	const products = await Product.find(filter);
+	const products = await Product.find(filter).select({ description: 0 }).exec();
 
 	if (searchTerm && products.length < 1) {
 		throw new ErrorWithStatus(
