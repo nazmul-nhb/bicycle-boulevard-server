@@ -13,5 +13,7 @@ export const generateFileName = (suffix: string): string => {
 		timeStamp: true,
 		separator: '_',
 		length: 6,
-	});
+	})
+		.replace(/[^a-zA-Z0-9-_ .]/g, ' ')
+		.toLowerCase();
 };

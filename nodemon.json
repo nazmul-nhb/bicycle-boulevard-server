@@ -9,7 +9,7 @@
 		"node_modules"
 	],
 	"exec": "ts-node --transpileOnly src/server.ts",
-	"delay": "500",
+	"delay": "2500",
 	"env": {
 		"NODE_ENV": "development"
 	},

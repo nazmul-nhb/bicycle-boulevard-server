@@ -1,13 +1,13 @@
-import { zodProduct } from './product.validation';
-import productServices from './product.services';
-import catchAsync from '../../utilities/catchAsync';
-import sendResponse from '../../utilities/sendResponse';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
-import { STATUS_CODES } from '../../constants';
-import { generateFileName } from '../../utilities/generateFileName';
-import type { TProduct } from './product.types';
-import { sendImageToCloudinary } from '../../utilities/uploadImage';
 import configs from '../../configs';
+import { STATUS_CODES } from '../../constants';
+import catchAsync from '../../utilities/catchAsync';
+import { generateFileName } from '../../utilities/generateFileName';
+import sendResponse from '../../utilities/sendResponse';
+import { sendImageToCloudinary } from '../../utilities/uploadImage';
+import productServices from './product.services';
+import type { TProduct } from './product.types';
+import { zodProduct } from './product.validation';
 
 /** * Create a new product (bicycle). */
 const createProduct = catchAsync(async (req, res) => {
