@@ -34,8 +34,11 @@ const saveProductInDB = async (productData: TProduct, email?: string) => {
 		);
 	}
 
-	const { description: _skip, ...resultWithoutIsDeleted } =
-		product.toObject();
+	const {
+		description: _1,
+		isDeleted: _2,
+		...resultWithoutIsDeleted
+	} = product.toObject();
 
 	return resultWithoutIsDeleted as TMinimalProduct;
 };
@@ -57,7 +60,9 @@ const getAllProductsFromDB = async (searchTerm?: string) => {
 		];
 	}
 
-	const products = await Product.find(filter).select({ description: 0 }).exec();
+	const products = await Product.find(filter)
+		.select({ description: 0 })
+		.exec();
 
 	if (searchTerm && products.length < 1) {
 		throw new ErrorWithStatus(

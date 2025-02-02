@@ -10,8 +10,16 @@ export type TProduct = z.infer<typeof zodProduct.creationSchema> & {
 
 export type TUpdateProduct = z.infer<typeof zodProduct.updateSchema>;
 
-export type TProductDocument = TProduct & Document;
+export type TProductDocument = TProduct &
+	Document & {
+		_id: Types.ObjectId;
+		createdAt: string;
+		updatedAt: string;
+	};
 
-export type TMinimalProduct = Omit<TProductDocument, 'description'> & {};
+export type TMinimalProduct = Omit<
+	TProductDocument,
+	'description' | 'isDeleted'
+>;
 
 export type TSearchQuery = { searchTerm?: string };
