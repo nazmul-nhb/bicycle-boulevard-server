@@ -41,6 +41,9 @@ const creationSchema = z
 	})
 	.strict();
 
-const updateSchema = creationSchema.partial().strict();
+const updateSchema = creationSchema
+	.partial()
+	.extend({ image: z.string().optional() })
+	.strict();
 
 export const zodProduct = { creationSchema, updateSchema };

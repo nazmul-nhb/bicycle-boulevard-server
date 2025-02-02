@@ -64,19 +64,34 @@ const getSingleProduct = catchAsync(async (req, res) => {
 const updateProduct = catchAsync(async (req, res) => {
 	const { id } = req.params;
 
+	// console.log(req.body);
+
 	const update = zodProduct.updateSchema.parse(req.body);
 
+	if (req.file) {
+		const fileName = generateFileName(update.name || id);
+
+		const { secure_url } = await sendImageToCloudinary(
+			fileName,
+			req.file.buffer,
+		);
+
+		update.image = secure_url;
+	}
+
 	// If client wants to update quantity, handle it properly
-	if (update.quantity && update.quantity > 0) {
-		update.inStock = true;
+	if (update.quantity) {
+		update.inStock = update.quantity > 0;
 	}
-	if (update.quantity && update.quantity <= 0) {
-		update.inStock = false;
+	if ('inStock' in update && update.inStock === false) {
+		update.quantity = 0;
 	}
 
-	const product = await productServices.updateProductInDB(id, update);
+	// console.log(update);
 
-	sendResponse(res, 'Bicycle', 'PATCH', product);
+	await productServices.updateProductInDB(id, update);
+
+	sendResponse(res, 'Bicycle', 'PATCH');
 });
 
 /** * Mark a product as deleted by mongodb `objectId`. */
