@@ -4,6 +4,7 @@ import { authRoutes } from '../modules/auth/auth.routes';
 import { adminRoutes } from '../modules/admin/admin.routes';
 import { productRoutes } from '../modules/product/product.routes';
 import { orderRoutes } from '../modules/order/order.routes';
+import { userRoutes } from '../modules/user/user.routes';
 
 const router = Router();
 
@@ -11,6 +12,10 @@ const routes: IRoute[] = [
 	{
 		path: '/auth',
 		route: authRoutes,
+	},
+	{
+		path: '/users',
+		route: userRoutes,
 	},
 	{
 		path: '/admin',

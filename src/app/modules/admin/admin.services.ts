@@ -16,7 +16,7 @@ const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
 	if (!admin || admin?.role !== 'admin') {
 		throw new ErrorWithStatus(
 			'Authorization Error',
-			'You do not have permission to block this user!',
+			'You do not have permission to deactivate this user!',
 			STATUS_CODES.UNAUTHORIZED,
 			'auth',
 		);
@@ -33,10 +33,19 @@ const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
 		);
 	}
 
-	if (user.isActive) {
+	if (user.email === admin.email) {
 		throw new ErrorWithStatus(
-			'Already Blocked',
-			`${user.name} is already blocked!`,
+			'Cannot Deactivate',
+			`You cannot deactivate yourself!`,
+			STATUS_CODES.CONFLICT,
+			'deactivate_user',
+		);
+	}
+
+	if (!user.isActive) {
+		throw new ErrorWithStatus(
+			'Already Deactivated',
+			`${user.name} is already deactivated!`,
 			STATUS_CODES.CONFLICT,
 			'user',
 		);
@@ -47,13 +56,13 @@ const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
 	if (result.modifiedCount < 1) {
 		throw new ErrorWithStatus(
 			'Bad Request',
-			`User with ID ${id} cannot be blocked!`,
+			`User with ID ${id} cannot be deactivated!`,
 			STATUS_CODES.BAD_REQUEST,
 			'user',
 		);
 	}
 
-	return 'User is Deactivated successfully!';
+	return 'User is deactivated successfully!';
 };
 
 export const adminServices = { deactivateUserInDB };
