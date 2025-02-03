@@ -22,7 +22,7 @@ router.get('/', productControllers.getAllProducts);
 
 router.get('/:id', productControllers.getSingleProduct);
 
-router.put(
+router.patch(
 	'/:id',
 	authorizeUser(USER_ROLES.ADMIN),
 	uploadFile.single('image'),

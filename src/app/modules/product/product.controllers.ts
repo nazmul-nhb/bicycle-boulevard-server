@@ -76,7 +76,7 @@ const updateProduct = catchAsync(async (req, res) => {
 			req.file.buffer,
 		);
 
-		update.image = secure_url;
+		update.image = secure_url.split(configs.imageBaseUrl)[1];
 	}
 
 	// If client wants to update quantity, handle it properly
