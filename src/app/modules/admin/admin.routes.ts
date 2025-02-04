@@ -6,9 +6,15 @@ import { USER_ROLES } from '../user/user.constants';
 const router = Router();
 
 router.patch(
-	'/users/:id/block',
+	'/users/block/:id',
 	authorizeUser(USER_ROLES.ADMIN),
-	adminControllers.deactivateUser,
+	adminControllers.toggleUserStatus,
+);
+
+router.patch(
+	'/users/unblock/:id',
+	authorizeUser(USER_ROLES.ADMIN),
+	adminControllers.toggleUserStatus,
 );
 
 export const adminRoutes = router;

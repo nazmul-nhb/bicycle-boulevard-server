@@ -5,18 +5,23 @@ import { STATUS_CODES } from '../../constants';
 import { validateObjectId } from '../../utilities/validateObjectId';
 
 /**
- * * Deactivate a user in MongoDB by updating the `isActive` field to `false`.
- * @param id User ID to block.
+ * * Deactivate/Reactivate a user in MongoDB by toggling `isActive` field.
+ * @param id User ID to block/unblock.
+ * @param blockUser Whether to block or unblock user; `true` means block user.
  * @param admin Current logged in user (admin) from decoded token.
  * @returns A message indicating the result of the operation.
  */
-const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
+const toggleUserStatusInDB = async (
+	id: string,
+	blockUser: boolean,
+	admin?: DecodedUser,
+) => {
 	validateObjectId(id, 'user', 'deactivate_user');
 
 	if (!admin || admin?.role !== 'admin') {
 		throw new ErrorWithStatus(
 			'Authorization Error',
-			'You do not have permission to deactivate this user!',
+			`You do not have permission to ${blockUser ? 'deactivate' : 'reactivate'} this user!`,
 			STATUS_CODES.UNAUTHORIZED,
 			'auth',
 		);
@@ -35,14 +40,14 @@ const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
 
 	if (user.email === admin.email) {
 		throw new ErrorWithStatus(
-			'Cannot Deactivate',
-			`You cannot deactivate yourself!`,
+			`Cannot  ${blockUser ? 'Deactivate' : 'Reactivate'}`,
+			`You cannot  ${blockUser ? 'deactivate' : 'reactivate'} yourself!`,
 			STATUS_CODES.CONFLICT,
 			'deactivate_user',
 		);
 	}
 
-	if (!user.isActive) {
+	if (blockUser && !user.isActive) {
 		throw new ErrorWithStatus(
 			'Already Deactivated',
 			`${user.name} is already deactivated!`,
@@ -51,18 +56,27 @@ const deactivateUserInDB = async (id: string, admin?: DecodedUser) => {
 		);
 	}
 
-	const result = await User.updateOne({ _id: id }, { isActive: false });
+	if (!blockUser && user.isActive) {
+		throw new ErrorWithStatus(
+			'Already Active',
+			`${user.name} is already active!`,
+			STATUS_CODES.CONFLICT,
+			'user',
+		);
+	}
+
+	const result = await User.updateOne({ _id: id }, { isActive: !blockUser });
 
 	if (result.modifiedCount < 1) {
 		throw new ErrorWithStatus(
 			'Bad Request',
-			`User with ID ${id} cannot be deactivated!`,
+			`User with ID ${id} cannot be ${blockUser ? 'deactivated' : 'reactivated'}!`,
 			STATUS_CODES.BAD_REQUEST,
 			'user',
 		);
 	}
 
-	return 'User is deactivated successfully!';
+	return `User is  ${blockUser ? 'deactivated' : 'reactivated'} successfully!`;
 };
 
-export const adminServices = { deactivateUserInDB };
+export const adminServices = { toggleUserStatusInDB };
