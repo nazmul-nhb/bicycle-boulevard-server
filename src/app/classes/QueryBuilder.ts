@@ -87,7 +87,7 @@ export class QueryBuilder<T> {
 	 * @param valueKey The key in the query parameters to extract the filter value.
 	 * @returns The current instance of QueryBuilder.
 	 */
-	banguFilter(field: keyof T, valueKey: string) {
+	customFilter(field: keyof T, valueKey: string) {
 		const value = this.query?.[valueKey] as string;
 
 		if (value) {

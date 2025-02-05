@@ -1,4 +1,3 @@
-import type { FilterQuery } from 'mongoose';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
 import { validateObjectId } from '../../utilities/validateObjectId';
@@ -10,6 +9,7 @@ import type {
 	TProductDocument,
 	TUpdateProduct,
 } from './product.types';
+import { QueryBuilder } from '../../classes/QueryBuilder';
 
 /**
  * * Create a new product in DB.
@@ -46,32 +46,29 @@ const saveProductInDB = async (productData: TProduct, email?: string) => {
 /**
  * * Get all products from DB.
  *
- * @param searchTerm Search keyword.
+ * @param search Search keyword.
  * @returns Returns all product data from the DB
  */
-const getAllProductsFromDB = async (searchTerm?: string) => {
-	const filter: FilterQuery<TProductDocument> = {};
+const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
+	const productQuery = new QueryBuilder(Product.find(), query)
+		.search(['name', 'brand', 'category'])
+		.filter()
+		.sort();
 
-	if (searchTerm) {
-		filter.$or = [
-			{ name: { $regex: searchTerm, $options: 'i' } },
-			{ brand: { $regex: searchTerm, $options: 'i' } },
-			{ category: { $regex: searchTerm, $options: 'i' } },
-		];
-	}
+	const products = await productQuery.modelQuery;
 
-	const products = await Product.find(filter)
-		.select({ description: 0 })
-		.exec();
+	// const products = await Product.find(filter)
+	// 	.select({ description: 0 })
+	// 	.exec();
 
-	if (searchTerm && products.length < 1) {
-		throw new ErrorWithStatus(
-			'Not Matched Error',
-			`No bicycle matched with search term: ${searchTerm}!`,
-			STATUS_CODES.NOT_FOUND,
-			'search_products',
-		);
-	}
+	// if (searchTerm && products.length < 1) {
+	// 	throw new ErrorWithStatus(
+	// 		'Not Matched Error',
+	// 		`No bicycle matched with search term: ${searchTerm}!`,
+	// 		STATUS_CODES.NOT_FOUND,
+	// 		'search_products',
+	// 	);
+	// }
 
 	return products;
 };

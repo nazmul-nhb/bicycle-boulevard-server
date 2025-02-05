@@ -42,11 +42,7 @@ const createProduct = catchAsync(async (req, res) => {
 
 /** * Get all student data from the DB. */
 const getAllProducts = catchAsync(async (req, res) => {
-	const { searchTerm } = req.query;
-
-	const products = await productServices.getAllProductsFromDB(
-		searchTerm as string,
-	);
+	const products = await productServices.getAllProductsFromDB(req.query);
 
 	sendResponse(res, 'Bicycle', 'GET', products);
 });
