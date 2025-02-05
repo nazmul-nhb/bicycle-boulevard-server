@@ -5,6 +5,7 @@ import { User } from '../user/user.model';
 import { Product } from './product.model';
 import type {
 	TMinimalProduct,
+	TPopulatedProduct,
 	TProduct,
 	TProductDocument,
 	TUpdateProduct,
@@ -55,20 +56,18 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 		.filter()
 		.sort();
 
-	const products = await productQuery.modelQuery;
+	const populatedProducts = await productQuery.modelQuery
+		.select('-description -isDeleted')
+		.populate<Pick<TPopulatedProduct, 'createdBy'>>({
+			path: 'createdBy',
+			select: 'email',
+		})
+		.lean<Array<TMinimalProduct & TPopulatedProduct>>();
 
-	// const products = await Product.find(filter)
-	// 	.select({ description: 0 })
-	// 	.exec();
-
-	// if (searchTerm && products.length < 1) {
-	// 	throw new ErrorWithStatus(
-	// 		'Not Matched Error',
-	// 		`No bicycle matched with search term: ${searchTerm}!`,
-	// 		STATUS_CODES.NOT_FOUND,
-	// 		'search_products',
-	// 	);
-	// }
+	const products = populatedProducts.map((product) => ({
+		...product,
+		createdBy: product.createdBy.email,
+	}));
 
 	return products;
 };
