@@ -36,7 +36,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.9.5",
 		"multer": "1.4.5-lts.1",
-		"nhb-toolbox": "^1.2.5",
+		"nhb-toolbox": "^2.0.1",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
@@ -63,5 +63,11 @@
 		"ts-node": "^10.9.2",
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.21.0"
+	},
+	"packageManager": "pnpm@10.4.0+sha512.6b849d0787d97f8f4e1f03a9b8ff8f038e79e153d6f11ae539ae7c435ff9e796df6a862c991502695c7f9e8fac8aeafc1ac5a8dab47e36148d183832d886dd52",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"bcrypt"
+		]
 	}
 }

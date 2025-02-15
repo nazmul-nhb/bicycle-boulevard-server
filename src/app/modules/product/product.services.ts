@@ -54,6 +54,7 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 	const productQuery = new QueryBuilder(Product.find(), query)
 		.search(['name', 'brand', 'category'])
 		.filter()
+		.paginate()
 		.sort();
 
 	const populatedProducts = await productQuery.modelQuery
