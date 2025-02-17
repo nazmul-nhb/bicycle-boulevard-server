@@ -1,4 +1,5 @@
 import { type Query, type FilterQuery, Model } from 'mongoose';
+import type { NumericKeys } from '../types';
 
 /**
  * @class QueryBuilder
@@ -54,6 +55,8 @@ export class QueryBuilder<T> {
 			'filter',
 			'page',
 			'limit',
+			'min',
+			'max',
 		];
 
 		excludeFields.forEach((field) => delete queryObj[field]);
@@ -77,6 +80,35 @@ export class QueryBuilder<T> {
 		sortBy[sortField] = sortOrder === 'asc' ? 1 : -1;
 
 		this.modelQuery = this.modelQuery.sort(sortBy);
+
+		return this;
+	}
+
+	/**
+	 * Method to filter results based on a field's range (min & max values).
+	 * Ensures that only numeric fields are allowed.
+	 * @param field The numeric field to filter by range (e.g., "price").
+	 * @returns The current instance of QueryBuilder.
+	 */
+	getRange(field: NumericKeys<T>) {
+		const min = this.query?.min ? Number(this.query.min) : undefined;
+		const max = this.query?.max ? Number(this.query.max) : undefined;
+
+		if (Number.isNaN(min) || Number.isNaN(max)) {
+			throw new Error(
+				`Invalid range values for field '${String(field)}', must be numeric.`,
+			);
+		}
+
+		if (min != null || max != null) {
+			const rangeFilter: FilterQuery<T> = {};
+			if (min != null)
+				rangeFilter[field] = { ...rangeFilter[field], $gte: min };
+			if (max != null)
+				rangeFilter[field] = { ...rangeFilter[field], $lte: max };
+
+			this.modelQuery = this.modelQuery.find(rangeFilter);
+		}
 
 		return this;
 	}

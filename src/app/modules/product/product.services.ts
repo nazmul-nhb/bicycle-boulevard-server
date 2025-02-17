@@ -1,4 +1,5 @@
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
+import { QueryBuilder } from '../../classes/QueryBuilder';
 import { STATUS_CODES } from '../../constants';
 import { validateObjectId } from '../../utilities/validateObjectId';
 import { User } from '../user/user.model';
@@ -10,7 +11,6 @@ import type {
 	TProductDocument,
 	TUpdateProduct,
 } from './product.types';
-import { QueryBuilder } from '../../classes/QueryBuilder';
 
 /**
  * * Create a new product in DB.
@@ -51,11 +51,35 @@ const saveProductInDB = async (productData: TProduct, email?: string) => {
  * @returns Returns all product data from the DB
  */
 const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
+	const { page = 1, limit = 10 } = query as {
+		page: number | string;
+		limit: number | string;
+	};
+
 	const productQuery = new QueryBuilder(Product.find(), query)
 		.search(['name', 'brand', 'category'])
 		.filter()
-		.paginate()
 		.sort();
+
+	const total = await Product.countDocuments(
+		productQuery.modelQuery.getFilter(),
+	);
+
+	const priceStats = await Product.aggregate([
+		{ $match: productQuery.modelQuery.getFilter() },
+		{
+			$group: {
+				_id: null,
+				minPrice: { $min: '$price' },
+				maxPrice: { $max: '$price' },
+			},
+		},
+	]);
+
+	const { minPrice = 0, maxPrice = 0 } = priceStats[0] || {};
+
+	// Apply pagination after getting the count
+	productQuery.paginate().getRange('price');
 
 	const populatedProducts = await productQuery.modelQuery
 		.select('-description -isDeleted')
@@ -70,7 +94,17 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 		createdBy: product.createdBy.email,
 	}));
 
-	return products;
+	// const total = await productQuery.modelQuery.countDocuments();
+
+	return {
+		total,
+		count: products.length,
+		currentPage: Number(page),
+		totalPages: Math.ceil(total / Number(limit)),
+		minPrice,
+		maxPrice,
+		products,
+	};
 };
 
 /**
