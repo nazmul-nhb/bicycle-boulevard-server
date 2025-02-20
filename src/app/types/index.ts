@@ -15,6 +15,10 @@ export type TResponseDetails = { message: string; statusCode: number };
 
 export type TStatusCode = (typeof STATUS_CODES)[keyof typeof STATUS_CODES];
 
+export type SearchField<T> = {
+	[K in keyof T]: T[K] extends string | number ? K : never;
+}[keyof T];
+
 /** * Extracts only numeric keys from type `T`. */
 export type NumericKeys<T> = {
 	[K in keyof T]: T[K] extends number ? K : never;

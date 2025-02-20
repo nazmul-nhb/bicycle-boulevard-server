@@ -1,5 +1,5 @@
-import { type Query, type FilterQuery, Model } from 'mongoose';
-import type { NumericKeys } from '../types';
+import { type FilterQuery, Model, type Query } from 'mongoose';
+import type { NumericKeys, SearchField } from '../types';
 
 /**
  * @class QueryBuilder
@@ -24,7 +24,7 @@ export class QueryBuilder<T> {
 	 * @param searchFields An array of field names to search in.
 	 * @returns The current instance of QueryBuilder.
 	 */
-	search(searchFields: string[]) {
+	search(searchFields: SearchField<T>[]) {
 		const keyword = this?.query?.search as string;
 
 		if (keyword) {
@@ -57,6 +57,8 @@ export class QueryBuilder<T> {
 			'limit',
 			'min',
 			'max',
+			'ids',
+			'select',
 		];
 
 		excludeFields.forEach((field) => delete queryObj[field]);
@@ -132,6 +134,26 @@ export class QueryBuilder<T> {
 	}
 
 	/**
+	 * Fetches documents based on the provided Object IDs as array.
+	 * @returns The current instance of QueryBuilder.
+	 */
+	getDocumentsByIds() {
+		let ids: string[] = [];
+
+		if (typeof this.query?.ids === 'string') {
+			ids = [this.query?.ids];
+		} else if (Array.isArray(this.query?.ids)) {
+			ids = this.query?.ids as string[];
+		}
+
+		if (ids.length > 0) {
+			this.modelQuery = this.modelQuery.find({ _id: { $in: ids } });
+		}
+
+		return this;
+	}
+
+	/**
 	 * Method to paginate the query based on `page` and `limit` from the query object.
 	 * @returns The current instance of QueryBuilder.
 	 */
@@ -141,6 +163,26 @@ export class QueryBuilder<T> {
 		const skip = (page - 1) * limit;
 
 		this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+
+		return this;
+	}
+
+	/**
+	 * Method to select or unselect field(s) from the document(s).
+	 * @returns The current instance of QueryBuilder.
+	 */
+	selectFields() {
+		const fields: string[] = ['-__v'];
+
+		if (typeof this?.query?.select === 'string') {
+			fields.push(this.query.select);
+		} else if (Array.isArray(this?.query?.select)) {
+			(this.query.select as string[]).forEach((field) =>
+				fields.push(field),
+			);
+		}
+
+		this.modelQuery = this.modelQuery.select(fields.join(' '));
 
 		return this;
 	}

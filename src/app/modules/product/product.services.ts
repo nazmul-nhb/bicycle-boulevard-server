@@ -59,6 +59,8 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 	const productQuery = new QueryBuilder(Product.find(), query)
 		.search(['name', 'brand', 'category'])
 		.filter()
+		.getDocumentsByIds()
+		.selectFields()
 		.sort();
 
 	const total = await Product.countDocuments(
@@ -82,7 +84,6 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 	productQuery.paginate().getRange('price');
 
 	const populatedProducts = await productQuery.modelQuery
-		.select('-description -isDeleted')
 		.populate<Pick<TPopulatedProduct, 'createdBy'>>({
 			path: 'createdBy',
 			select: 'email',
@@ -93,8 +94,6 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 		...product,
 		createdBy: product.createdBy.email,
 	}));
-
-	// const total = await productQuery.modelQuery.countDocuments();
 
 	return {
 		total,
