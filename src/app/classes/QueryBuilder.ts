@@ -1,5 +1,5 @@
 import { type FilterQuery, Model, type Query } from 'mongoose';
-import type { NumericKeys, SearchField } from '../types';
+import type { ExcludeField, NumericKeys, SearchField } from '../types';
 
 /**
  * @class QueryBuilder
@@ -46,7 +46,7 @@ export class QueryBuilder<T> {
 	 * @returns The current instance of QueryBuilder.
 	 */
 	filter() {
-		const queryObj = { ...this.query };
+		const queryObj = { ...this?.query };
 
 		const excludeFields = [
 			'search',
@@ -58,6 +58,7 @@ export class QueryBuilder<T> {
 			'min',
 			'max',
 			'ids',
+			'exclude',
 			'select',
 		];
 
@@ -75,8 +76,8 @@ export class QueryBuilder<T> {
 	 * @returns The current instance of QueryBuilder.
 	 */
 	sort() {
-		const sortField = (this.query?.sortBy as string) || 'createdAt';
-		const sortOrder = (this.query?.sortOrder as string) || 'desc';
+		const sortField = (this?.query?.sortBy as string) || 'createdAt';
+		const sortOrder = (this?.query?.sortOrder as string) || 'desc';
 
 		const sortBy: { [key: string]: 1 | -1 } = {};
 		sortBy[sortField] = sortOrder === 'asc' ? 1 : -1;
@@ -93,8 +94,8 @@ export class QueryBuilder<T> {
 	 * @returns The current instance of QueryBuilder.
 	 */
 	getRange(field: NumericKeys<T>) {
-		const min = this.query?.min ? Number(this.query.min) : undefined;
-		const max = this.query?.max ? Number(this.query.max) : undefined;
+		const min = this?.query?.min ? Number(this?.query?.min) : undefined;
+		const max = this?.query?.max ? Number(this?.query?.max) : undefined;
 
 		if (Number.isNaN(min) || Number.isNaN(max)) {
 			throw new Error(
@@ -122,7 +123,7 @@ export class QueryBuilder<T> {
 	 * @returns The current instance of QueryBuilder.
 	 */
 	customFilter(field: keyof T, valueKey: string) {
-		const value = this.query?.[valueKey] as string;
+		const value = this?.query?.[valueKey] as string;
 
 		if (value) {
 			this.modelQuery = this.modelQuery.find({
@@ -140,10 +141,10 @@ export class QueryBuilder<T> {
 	getDocumentsByIds() {
 		let ids: string[] = [];
 
-		if (typeof this.query?.ids === 'string') {
-			ids = [this.query?.ids];
-		} else if (Array.isArray(this.query?.ids)) {
-			ids = this.query?.ids as string[];
+		if (typeof this?.query?.ids === 'string') {
+			ids = [this?.query?.ids];
+		} else if (Array.isArray(this?.query?.ids)) {
+			ids = this?.query?.ids as string[];
 		}
 
 		if (ids.length > 0) {
@@ -168,21 +169,28 @@ export class QueryBuilder<T> {
 	}
 
 	/**
-	 * Method to select or unselect field(s) from the document(s).
+	 * Method to exclude field(s) from the document(s).
+	 * @param fixedFields An array of fields to always exclude from the document(s).
 	 * @returns The current instance of QueryBuilder.
 	 */
-	selectFields() {
+	excludeFields(fixedFields?: ExcludeField<T>[]) {
 		const fields: string[] = ['-__v'];
 
-		if (typeof this?.query?.select === 'string') {
-			fields.push(this.query.select);
-		} else if (Array.isArray(this?.query?.select)) {
-			(this.query.select as string[]).forEach((field) =>
+		if (fixedFields && fixedFields.length > 0) {
+			fixedFields.forEach((field) => fields.push(field));
+		}
+
+		if (typeof this?.query?.exclude === 'string') {
+			fields.push(this?.query?.exclude);
+		} else if (Array.isArray(this?.query?.exclude)) {
+			(this?.query?.exclude as string[]).forEach((field) =>
 				fields.push(field),
 			);
 		}
 
-		this.modelQuery = this.modelQuery.select(fields.join(' '));
+		this.modelQuery = this.modelQuery.select(
+			[...new Set(fields)].join(' '),
+		);
 
 		return this;
 	}

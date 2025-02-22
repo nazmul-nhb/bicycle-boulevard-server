@@ -60,23 +60,24 @@ const getAllProductsFromDB = async (query?: Record<string, unknown>) => {
 		.search(['name', 'brand', 'category'])
 		.filter()
 		.getDocumentsByIds()
-		.selectFields()
+		.excludeFields(['-isDeleted', '-description'])
 		.sort();
 
 	const total = await Product.countDocuments(
 		productQuery.modelQuery.getFilter(),
 	);
 
-	const priceStats = await Product.aggregate([
-		{ $match: productQuery.modelQuery.getFilter() },
-		{
-			$group: {
-				_id: null,
-				minPrice: { $min: '$price' },
-				maxPrice: { $max: '$price' },
+	const priceStats: { minPrice: number; maxPrice: number }[] =
+		await Product.aggregate([
+			{ $match: productQuery.modelQuery.getFilter() },
+			{
+				$group: {
+					_id: null,
+					minPrice: { $min: '$price' },
+					maxPrice: { $max: '$price' },
+				},
 			},
-		},
-	]);
+		]);
 
 	const { minPrice = 0, maxPrice = 0 } = priceStats[0] || {};
 
