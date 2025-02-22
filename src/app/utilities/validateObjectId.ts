@@ -1,4 +1,4 @@
-import { isValidObjectId } from 'mongoose';
+import { isValidObjectId, type Types } from 'mongoose';
 import { ErrorWithStatus } from '../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../constants';
 import type { TCollection } from '../types';
@@ -10,7 +10,7 @@ import type { TCollection } from '../types';
  * @param path Path where the error occurred.
  */
 export const validateObjectId = (
-	id: string,
+	id: Types.ObjectId | string,
 	collection: Lowercase<TCollection>,
 	path: string,
 ) => {

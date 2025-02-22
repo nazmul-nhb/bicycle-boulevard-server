@@ -1,15 +1,29 @@
-import { Order } from './order.model';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
-import type { TCalculatedRevenue, TOrder, TOrderDocument } from './order.types';
 import { STATUS_CODES } from '../../constants';
+import { Order } from './order.model';
+import type { TCalculatedRevenue, TOrder } from './order.types';
 
 /**
- * * Save product order(s) in DB.
- * @param orderData Accepts order data sent from client
+ * Save a single order with multiple products in DB.
+ * @param email User's email from req.user.email
+ * @param orderData Array of { id: string, quantity: number } sent from client
  * @returns Saved order from MongoDB
  */
-const saveOrderInDB = async (orderData: TOrder): Promise<TOrderDocument> => {
-	const order = await Order.create(orderData);
+const saveOrderInDB = async (
+	orderData: Pick<TOrder, 'products'>,
+	email?: string,
+) => {
+	if (!email) {
+		throw new ErrorWithStatus(
+			'Authentication Error',
+			'You must login first!',
+			STATUS_CODES.UNAUTHORIZED,
+			'create_order',
+		);
+	}
+
+	// Create the order
+	const order = await Order.create({ email, ...orderData });
 
 	if (!order) {
 		throw new ErrorWithStatus(
