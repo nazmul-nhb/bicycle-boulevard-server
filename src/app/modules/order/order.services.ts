@@ -1,7 +1,13 @@
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
+import type { DecodedUser } from '../../types/interfaces';
+import { User } from '../user/user.model';
 import { Order } from './order.model';
-import type { TCalculatedRevenue, TOrder } from './order.types';
+import type {
+	TCalculatedRevenue,
+	TOrder,
+	TPopulatedOrder,
+} from './order.types';
 
 /**
  * Save a single order with multiple products in DB.
@@ -37,6 +43,23 @@ const saveOrderInDB = async (
 	return order;
 };
 
+const getOrderDataFromDB = async (user?: DecodedUser) => {
+	const dbUser = await User.validateUser(user?.email);
+
+	const filter: Record<string, string> = {};
+
+	if (dbUser.role !== 'admin') {
+		filter.email = dbUser.email;
+	}
+
+	const orders = await Order.find(filter).populate<TPopulatedOrder>({
+		path: 'products.product',
+		select: '-description -createdBy -isDeleted',
+	});
+
+	return orders;
+};
+
 /** * Calculate total revenue for all the orders */
 const calculateOrderRevenue = async (): Promise<number> => {
 	const revenue: TCalculatedRevenue[] = await Order.aggregate([
@@ -62,4 +85,4 @@ const calculateOrderRevenue = async (): Promise<number> => {
 	return revenue.length && revenue[0].total;
 };
 
-export default { saveOrderInDB, calculateOrderRevenue };
+export default { saveOrderInDB, getOrderDataFromDB, calculateOrderRevenue };

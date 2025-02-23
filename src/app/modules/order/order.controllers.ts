@@ -9,6 +9,13 @@ const createOrder = catchAsync(async (req, res) => {
 	sendResponse(res, 'Order', 'POST', order, 'Order placed successfully!');
 });
 
+/** * Get orders */
+const getOrders = catchAsync(async (req, res) => {
+	const orders = await orderServices.getOrderDataFromDB(req.user);
+
+	sendResponse(res, 'Order', 'GET', orders);
+});
+
 /** * Get Revenue from Orders */
 const getOrderRevenue = catchAsync(async (_req, res) => {
 	const totalRevenue = await orderServices.calculateOrderRevenue();
@@ -22,4 +29,4 @@ const getOrderRevenue = catchAsync(async (_req, res) => {
 	);
 });
 
-export default { createOrder, getOrderRevenue };
+export default { createOrder, getOrders, getOrderRevenue };

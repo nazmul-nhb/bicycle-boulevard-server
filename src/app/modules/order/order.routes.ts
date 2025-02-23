@@ -9,9 +9,15 @@ const router = express.Router();
 
 router.post(
 	'/',
-	authorizeUser(USER_ROLES.CUSTOMER), // ! remove admin after checking
+	authorizeUser(USER_ROLES.CUSTOMER),
 	validateRequest(zodOrder.creationSchema),
 	orderControllers.createOrder,
+);
+
+router.get(
+	'/',
+	authorizeUser(USER_ROLES.CUSTOMER, USER_ROLES.ADMIN),
+	orderControllers.getOrders,
 );
 router.get('/revenue', orderControllers.getOrderRevenue);
 
