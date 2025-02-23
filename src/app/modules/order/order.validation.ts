@@ -3,7 +3,7 @@ import { isValidObjectId } from 'mongoose';
 
 // Schema for each product in the array
 const productSchema = z.object({
-	id: z
+	product: z
 		.string({ message: 'Product ID is required!' })
 		.trim()
 		.refine((id) => isValidObjectId(id), {

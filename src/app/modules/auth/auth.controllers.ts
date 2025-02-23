@@ -33,7 +33,7 @@ const registerUser = catchAsync(async (req, res) => {
 		);
 	}
 
-	const fileName = generateFileName(userToCreate.name);
+	const fileName = generateFileName('user');
 
 	const { secure_url } = await sendImageToCloudinary(
 		fileName,

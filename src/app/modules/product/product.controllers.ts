@@ -22,7 +22,7 @@ const createProduct = catchAsync(async (req, res) => {
 		);
 	}
 
-	const fileName = generateFileName(productToCreate.name);
+	const fileName = generateFileName('product');
 
 	const { secure_url } = await sendImageToCloudinary(
 		fileName,
@@ -65,7 +65,7 @@ const updateProduct = catchAsync(async (req, res) => {
 	const update = zodProduct.updateSchema.parse(req.body);
 
 	if (req.file) {
-		const fileName = generateFileName(update.name || id);
+		const fileName = generateFileName('product');
 
 		const { secure_url } = await sendImageToCloudinary(
 			fileName,

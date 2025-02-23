@@ -6,6 +6,7 @@ import { Product } from '../product/product.model';
 import productServices from '../product/product.services';
 import type { TUpdateProduct } from '../product/product.types';
 import { zodProduct } from '../product/product.validation';
+import { ORDER_STATUS, PAYMENT_STATUS } from './order.constants';
 import type { TOrderDocument } from './order.types';
 
 const orderSchema = new Schema<TOrderDocument>(
@@ -18,7 +19,7 @@ const orderSchema = new Schema<TOrderDocument>(
 		products: [
 			{
 				_id: false,
-				id: {
+				product: {
 					type: Schema.Types.ObjectId,
 					ref: 'Product',
 					required: [true, 'Product ID is required!'],
@@ -35,6 +36,16 @@ const orderSchema = new Schema<TOrderDocument>(
 			required: false,
 			min: [0, 'Total price must be a non-negative number!'],
 		},
+		paymentStatus: {
+			type: String,
+			enum: PAYMENT_STATUS,
+			default: 'pending',
+		},
+		orderStatus: {
+			type: String,
+			enum: ORDER_STATUS,
+			default: 'pending',
+		},
 	},
 	{
 		timestamps: true,
@@ -46,19 +57,19 @@ const orderSchema = new Schema<TOrderDocument>(
 orderSchema.pre('save', async function (next) {
 	// Validate all product IDs
 	for (const item of this.products) {
-		validateObjectId(item.id, 'product', 'create_order');
+		validateObjectId(item.product, 'product', 'create_order');
 	}
 
 	let totalPrice = 0;
 
 	// Process each product in the order
 	for (const item of this.products) {
-		const product = await Product.findById(item.id);
+		const product = await Product.findById(item.product);
 
 		if (!product) {
 			throw new ErrorWithStatus(
 				'Not Found Error',
-				`No product found with id: ${item.id}!`,
+				`No product found with id: ${item.product}!`,
 				STATUS_CODES.NOT_FOUND,
 				'create_order',
 			);
@@ -89,7 +100,7 @@ orderSchema.pre('save', async function (next) {
 		const sanitizedData = zodProduct.updateSchema.parse(productUpdate);
 
 		await productServices.updateProductInDB(
-			item.id as string,
+			item.product as string,
 			sanitizedData,
 		);
 	}
