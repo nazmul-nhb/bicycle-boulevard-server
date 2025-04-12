@@ -57,10 +57,12 @@ const getOrderDataFromDB = async (user?: DecodedUser) => {
 		filter.email = dbUser.email;
 	}
 
-	const orders = await Order.find(filter).populate<TPopulatedOrder>({
-		path: 'products.product',
-		select: '-description -createdBy -isDeleted',
-	});
+	const orders = await Order.find(filter)
+		.populate<TPopulatedOrder>({
+			path: 'products.product',
+			select: '-description -createdBy -isDeleted',
+		})
+		.sort({ createdAt: -1 });
 
 	return orders;
 };

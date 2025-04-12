@@ -62,17 +62,17 @@ const getSingleProduct = catchAsync(async (req, res) => {
 const updateProduct = catchAsync(async (req, res) => {
 	const { id } = req.params;
 
-	// console.log(req.body);
-
 	const update = zodProduct.updateSchema.parse(req.body);
 
 	if (req.file) {
-		const fileName = generateFileName('product');
+		const fileName = generateFileName('product').trim();
 
 		const { secure_url } = await sendImageToCloudinary(
 			fileName,
 			req.file.buffer,
 		);
+
+		req.cloudinary_public_id = fileName;
 
 		update.image = secure_url.split(configs.imageBaseUrl)[1];
 	}
