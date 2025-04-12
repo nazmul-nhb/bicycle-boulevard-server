@@ -15,7 +15,8 @@
 		"start": "node dist/server.js",
 		"format": "prettier --write src/",
 		"lint": "node lint.mjs",
-		"fix": "node fix.mjs"
+		"fix": "node fix.mjs",
+		"serve": "node build.mjs && node dist/server.js"
 	},
 	"keywords": [
 		"typescript",
@@ -36,7 +37,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.9.5",
 		"multer": "1.4.5-lts.1",
-		"nhb-toolbox": "^2.1.2",
+		"nhb-toolbox": "^4.0.4",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {

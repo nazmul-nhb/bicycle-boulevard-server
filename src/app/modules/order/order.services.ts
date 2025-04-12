@@ -43,6 +43,11 @@ const saveOrderInDB = async (
 	return order;
 };
 
+/**
+ * * Get all orders for both logged in customer and admin.
+ * @param user Decoded user from token.
+ * @returns Matched order data.
+ */
 const getOrderDataFromDB = async (user?: DecodedUser) => {
 	const dbUser = await User.validateUser(user?.email);
 

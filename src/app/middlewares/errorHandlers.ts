@@ -4,9 +4,18 @@ import { STATUS_CODES } from '../constants';
 import processErrors from '../errors/processErrors';
 import { ErrorWithStatus } from '../classes/ErrorWithStatus';
 import type { RequestHandler, ErrorRequestHandler } from 'express';
+import { v2 as cloudinary } from 'cloudinary';
 
 /** Middleware to Handle "Not Found" Errors.*/
-export const handleRouteNotFound: RequestHandler = (req, _res, next) => {
+export const handleRouteNotFound: RequestHandler = async (req, _res, next) => {
+	if (req.cloudinary_public_id) {
+		try {
+			await cloudinary.uploader.destroy(req.cloudinary_public_id);
+		} catch (err) {
+			console.error('Cloudinary cleanup failed:', err);
+		}
+	}
+
 	const error = new ErrorWithStatus(
 		'Not Found Error',
 		`Requested End-Point “${req.method}: ${req.path}” Not Found!`,

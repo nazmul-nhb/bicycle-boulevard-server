@@ -13,14 +13,14 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 export const uploadFile = multer({ storage });
 
-// Upload file to Cloudinary directly from memory
 export const sendImageToCloudinary = (
 	imageName: string,
 	buffer: Buffer,
+	folder = 'bicycle',
 ): Promise<UploadApiResponse> => {
 	return new Promise((resolve, reject) => {
 		const uploadStream = cloudinary.uploader.upload_stream(
-			{ public_id: imageName.trim() },
+			{ folder, public_id: imageName },
 			(error, result) => {
 				if (error) {
 					return reject(error);

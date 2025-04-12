@@ -4,25 +4,25 @@ import { STATUS_CODES } from '../../constants';
 import catchAsync from '../../utilities/catchAsync';
 import sendResponse from '../../utilities/sendResponse';
 import { sendImageToCloudinary } from '../../utilities/uploadImage';
-import { User } from '../user/user.model';
-import { authServices } from './auth.services';
-import type { IUser } from '../user/user.types';
+// import { User } from '../user/user.model';
 import { generateFileName } from '../../utilities/generateFileName';
+import type { IUser } from '../user/user.types';
+import { authServices } from './auth.services';
 
 /** * Register a new user */
 const registerUser = catchAsync(async (req, res) => {
 	const userToCreate = req.body as IUser;
 
-	const existingUser = await User.findOne({ email: userToCreate.email });
+	// const existingUser = await User.findOne({ email: userToCreate.email });
 
-	if (existingUser) {
-		throw new ErrorWithStatus(
-			'Duplicate Error',
-			`User already exists with email: ${userToCreate.email}!`,
-			STATUS_CODES.CONFLICT,
-			'register_user',
-		);
-	}
+	// if (existingUser) {
+	// 	throw new ErrorWithStatus(
+	// 		'Duplicate Error',
+	// 		`User already exists with email: ${userToCreate.email}!`,
+	// 		STATUS_CODES.CONFLICT,
+	// 		'register_user',
+	// 	);
+	// }
 
 	if (!req.file) {
 		throw new ErrorWithStatus(
@@ -33,12 +33,14 @@ const registerUser = catchAsync(async (req, res) => {
 		);
 	}
 
-	const fileName = generateFileName('user');
+	const fileName = generateFileName('user').trim();
 
 	const { secure_url } = await sendImageToCloudinary(
 		fileName,
 		req.file.buffer,
 	);
+
+	req.cloudinary_public_id = fileName;
 
 	const user = await authServices.registerUserInDB({
 		...userToCreate,
