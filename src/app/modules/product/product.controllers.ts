@@ -22,12 +22,14 @@ const createProduct = catchAsync(async (req, res) => {
 		);
 	}
 
-	const fileName = generateFileName('product');
+	const fileName = generateFileName('product').trim();
 
 	const { secure_url } = await sendImageToCloudinary(
 		fileName,
 		req.file.buffer,
 	);
+
+	req.cloudinary_public_id = fileName;
 
 	const product = await productServices.saveProductInDB(
 		{

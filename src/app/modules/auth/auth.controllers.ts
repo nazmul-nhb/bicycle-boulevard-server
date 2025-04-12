@@ -13,17 +13,6 @@ import { authServices } from './auth.services';
 const registerUser = catchAsync(async (req, res) => {
 	const userToCreate = req.body as IUser;
 
-	// const existingUser = await User.findOne({ email: userToCreate.email });
-
-	// if (existingUser) {
-	// 	throw new ErrorWithStatus(
-	// 		'Duplicate Error',
-	// 		`User already exists with email: ${userToCreate.email}!`,
-	// 		STATUS_CODES.CONFLICT,
-	// 		'register_user',
-	// 	);
-	// }
-
 	if (!req.file) {
 		throw new ErrorWithStatus(
 			'Image Required',

@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
-import type { IUserDoc, IUserModel } from './user.types';
-import { hashPassword } from '../../utilities/authUtilities';
 import { ErrorWithStatus } from '../../classes/ErrorWithStatus';
 import { STATUS_CODES } from '../../constants';
+import { hashPassword } from '../../utilities/authUtilities';
 import { USER_ROLES } from './user.constants';
+import type { IUserDoc, IUserModel } from './user.types';
 
 const userSchema = new Schema<IUserDoc>(
 	{
@@ -46,7 +46,7 @@ const userSchema = new Schema<IUserDoc>(
 	},
 );
 
-// * Hash password before saving the user in DB.
+// * Check for duplicate user & Hash password before saving the user in DB.
 userSchema.pre('save', async function (next) {
 	this.password = await hashPassword(this.password);
 

@@ -1,21 +1,16 @@
 import chalk from 'chalk';
+import type {
+	ErrorRequestHandler as ErrorHandler,
+	RequestHandler,
+} from 'express';
+import { ErrorWithStatus } from '../classes/ErrorWithStatus';
 import configs from '../configs';
 import { STATUS_CODES } from '../constants';
 import processErrors from '../errors/processErrors';
-import { ErrorWithStatus } from '../classes/ErrorWithStatus';
-import type { RequestHandler, ErrorRequestHandler } from 'express';
-import { v2 as cloudinary } from 'cloudinary';
+import { deleteFromCloudinary } from '../utilities/uploadImage';
 
 /** Middleware to Handle "Not Found" Errors.*/
-export const handleRouteNotFound: RequestHandler = async (req, _res, next) => {
-	if (req.cloudinary_public_id) {
-		try {
-			await cloudinary.uploader.destroy(req.cloudinary_public_id);
-		} catch (err) {
-			console.error('Cloudinary cleanup failed:', err);
-		}
-	}
-
+export const handleRouteNotFound: RequestHandler = (req, _res, next) => {
 	const error = new ErrorWithStatus(
 		'Not Found Error',
 		`Requested End-Point “${req.method}: ${req.path}” Not Found!`,
@@ -27,7 +22,26 @@ export const handleRouteNotFound: RequestHandler = async (req, _res, next) => {
 };
 
 /** Middleware to Handle Global Errors. */
-export const catchAllErrors: ErrorRequestHandler = (err, _req, res, next) => {
+export const catchAllErrors: ErrorHandler = async (err, req, res, next) => {
+	if (req.cloudinary_public_id) {
+		try {
+			const res = await deleteFromCloudinary(req.cloudinary_public_id);
+
+			if (res.result === 'ok') {
+				delete req.cloudinary_public_id;
+			} else {
+				throw new ErrorWithStatus(
+					'Cloudinary Delete Failed',
+					'Failed to delete image from Cloudinary!',
+					STATUS_CODES.BAD_REQUEST,
+					req.path,
+				);
+			}
+		} catch (err) {
+			console.error(chalk.redBright('Cloudinary cleanup failed:', err));
+		}
+	}
+
 	const { statusCode, name, errorSource, stack } = processErrors(err);
 
 	// * Log error msg in the server console
